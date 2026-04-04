@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"sleep 3 && ssh -i ~/.ssh/id_cybernord void@10.10.0.5 'ps aux | grep vibe-island | grep -v grep && echo \\\"---\\\" && cat /tmp/vibe-island.log 2>/dev/null | tail -15' 2>&1\",\"timeout\":15000,\"de...",
-  "error": "Exit code 1",
-  "timestamp": "2026-04-04T04:48:56.697Z",
-  "retry_count": 1
+  "tool_input_preview": "{\"command\":\"# Try WAN IP instead of WireGuard\\nssh -i ~/.ssh/id_cybernord -o ConnectTimeout=5 void@78.26.8.31 'echo ALIVE' 2>&1\",\"timeout\":10000,\"description\":\"Try WAN IP\"}",
+  "error": "Exit code 255\nssh: connect to host 78.26.8.31 port 22: Connection timed out",
+  "timestamp": "2026-04-04T06:24:16.396Z",
+  "retry_count": 2
 }
