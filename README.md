@@ -1,9 +1,8 @@
+<h1 align="center">Vibe Island</h1>
+
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.svg" />
-    <img alt="Vibe Island — A Dynamic Island for your AI coding tools" src="assets/banner-dark.svg" width="900" />
-  </picture>
+  <b>A Dynamic Island for your AI coding tools.</b><br/>
+  <sub>Monitor sessions · Approve permissions · Jump to terminal · Sound effects · Zero config</sub>
 </p>
 
 <p align="center">
@@ -24,14 +23,6 @@
   <img src="https://img.shields.io/badge/GNOME-supported-4A86CF?style=flat-square&logo=gnome&logoColor=white" alt="GNOME" />
   <img src="https://img.shields.io/badge/KDE-supported-1D99F3?style=flat-square&logo=kde&logoColor=white" alt="KDE" />
 </p>
-
-<div align="center">
-
-**A Dynamic Island for your AI coding tools.**
-
-Monitor sessions · Approve permissions · Jump to terminal · Sound effects · Zero config
-
-</div>
 
 ---
 
