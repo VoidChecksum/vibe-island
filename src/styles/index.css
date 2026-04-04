@@ -2,15 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+
 @layer base {
   * {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     background: transparent;
+    color: #ffffff;
   }
+}
+
+/* ── Vibe Island Design Tokens (matching original v6 CSS) ── */
+:root {
+  --vi-idle: #22c55e;
+  --vi-idle-bright: #4ade80;
+  --vi-work: #3b82f6;
+  --vi-work-bright: #60a5fa;
+  --vi-alert: #f97316;
+  --vi-alert-bright: #fb923c;
+  --vi-question: #c084fc;
+  --vi-question-bright: #d8b4fe;
+  --vi-explore: #06b6d4;
+  --vi-explore-bright: #22d3ee;
+
+  --notch-bg: #0a0a0a;
+  --notch-surface: #1e1e1e;
+  --notch-border: #2c2c30;
+  --notch-hover: #333338;
+  --notch-text: #ffffff;
+  --notch-muted: #44444a;
+  --notch-radius: 22px;
 }
 
 /* Drag region for window movement */
@@ -18,24 +43,200 @@
   -webkit-app-region: drag;
 }
 
-/* Scrollbar styling */
+/* No-drag for interactive elements */
+button, input, select, a, [data-no-drag] {
+  -webkit-app-region: no-drag;
+}
+
+/* Scrollbar — thin, dark */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 3px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #3a3a3a;
+  background: var(--notch-border);
   border-radius: 2px;
 }
 
-/* Tool icon colors */
-.tool-claude { color: #D97706; }
-.tool-codex { color: #10B981; }
-.tool-gemini { color: #6366F1; }
-.tool-cursor { color: #EC4899; }
-.tool-copilot { color: #8B5CF6; }
-.tool-opencode { color: #06B6D4; }
-.tool-windsurf { color: #14B8A6; }
-.tool-default { color: #9CA3AF; }
+/* ── Pixel Pet SVG (matching original crispEdges rendering) ── */
+.pixel-pet svg {
+  shape-rendering: crispEdges;
+  image-rendering: pixelated;
+}
+
+/* ── Notch Shell ── */
+.notch-shell {
+  background: var(--notch-bg);
+  border: 1px solid var(--notch-border);
+  border-radius: var(--notch-radius);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  transition: border-radius 0.3s ease, max-height 0.3s ease;
+}
+
+.notch-shell.expanded {
+  border-radius: 18px;
+}
+
+/* ── Session Card (matching original v6-sess layout) ── */
+.sess-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  transition: background 0.15s ease;
+  cursor: pointer;
+}
+
+.sess-card:hover {
+  background: var(--notch-hover);
+}
+
+.sess-card .sess-pet {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.sess-card .sess-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.sess-card .sess-r1 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.sess-card .sess-name {
+  color: var(--notch-text);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.sess-card .sess-tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+}
+
+.sess-card .sess-dur {
+  font-size: 10px;
+  color: var(--notch-muted);
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.sess-card .sess-you {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Approval Buttons (matching original v6-approve-bar) ── */
+.approve-bar {
+  display: flex;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+.approve-btn {
+  flex: 1;
+  padding: 6px 0;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.approve-btn.deny {
+  background: rgba(255, 95, 86, 0.15);
+  color: #ff5f56;
+}
+.approve-btn.deny:hover {
+  background: rgba(255, 95, 86, 0.25);
+}
+
+.approve-btn.allow {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+.approve-btn.allow:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.approve-btn.always {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+.approve-btn.always:hover {
+  background: rgba(34, 197, 94, 0.25);
+}
+
+/* ── Compact Pill (idle state) ── */
+.compact-pill {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 14px;
+  gap: 8px;
+}
+
+.compact-pill .idle-text {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compact-pill .idle-count {
+  font-size: 11px;
+  color: var(--notch-muted);
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* ── Pulse dot animation ── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* ── Tool source colors ── */
+.source-claude { color: #f97316; }
+.source-codex { color: #22c55e; }
+.source-gemini { color: #3b82f6; }
+.source-cursor { color: #c084fc; }
+.source-opencode { color: #06b6d4; }
+.source-copilot { color: #8b5cf6; }
+.source-windsurf { color: #14b8a6; }
+.source-codebuddy { color: #f59e0b; }
+.source-qoder { color: #ef4444; }
+.source-droid { color: #84cc16; }

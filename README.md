@@ -37,6 +37,10 @@ Monitor sessions · Approve permissions · Jump to terminal · Sound effects · 
 
 ## What is Vibe Island?
 
+<p align="center">
+  <img src="assets/og.png" alt="Vibe Island Preview" width="800" />
+</p>
+
 A floating notch panel that sits at the top of your screen and monitors all your AI coding sessions — Claude Code, Codex, Gemini, Cursor, and more. See which agents are running, approve permissions without switching windows, and jump to the exact terminal tab with one click.
 
 <table>

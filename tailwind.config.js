@@ -5,16 +5,26 @@ export default {
     extend: {
       colors: {
         island: {
-          bg: "#1a1a1a",
-          surface: "#2a2a2a",
-          border: "#3a3a3a",
-          text: "#e0e0e0",
-          muted: "#888888",
-          accent: "#00D4FF",
-          green: "#34D399",
-          amber: "#FBBF24",
-          red: "#F87171",
-          purple: "#A78BFA",
+          bg: "#0a0a0a",
+          surface: "#1e1e1e",
+          border: "#2c2c30",
+          hover: "#333338",
+          text: "#ffffff",
+          muted: "#44444a",
+          accent: "#06b6d4",
+          green: "#22c55e",
+          "green-bright": "#27c93f",
+          amber: "#ffbd2e",
+          red: "#ff5f56",
+          orange: "#f97316",
+          purple: "#c084fc",
+          blue: "#3b82f6",
+          // Vibe Island state colors (from original CSS vars)
+          idle: "#22c55e",       // --vi-idle
+          work: "#3b82f6",       // --vi-work
+          alert: "#f97316",      // --vi-alert
+          question: "#c084fc",   // --vi-question
+          explore: "#06b6d4",    // --vi-explore
         },
       },
       borderRadius: {
