@@ -1,5 +1,7 @@
 node_modules/
-dist/
+dist/*.js
+dist/*.css
+dist/assets/
 src-tauri/target/
 *.lock
 .DS_Store
