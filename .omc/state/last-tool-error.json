@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"gh repo create VoidChecksum/vibe-island --public --description \\\"A Dynamic Island for your AI coding tools — monitor Claude Code, Codex, Gemini, Cursor and more from a floating notch panel...",
+  "error": "Exit code 1\nthe `--source` option is not supported with `--clone`, `--template`, `--license`, or `--gitignore`\n\nUsage:  gh repo create [<name>] [flags]\n\nFlags:\n      --add-readme             Add a README file to the new repository\n  -c, --clone                  Clone the new repository to the current directory\n  -d, --description string     Description of the repository\n      --disable-issues         Disable issues in the new repository\n      --disable-wiki           Disable wiki in the new repo...",
+  "timestamp": "2026-04-04T03:52:57.691Z",
+  "retry_count": 1
+}
