@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 200">
+  <defs>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0099CC;stop-opacity:0.2" />
+      <stop offset="50%" style="stop-color:#0099CC;stop-opacity:0.5" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:0.2" />
+    </linearGradient>
+    <linearGradient id="pill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f5f5f5" />
+      <stop offset="100%" style="stop-color:#e8e8e8" />
+    </linearGradient>
+    <filter id="blur">
+      <feGaussianBlur stdDeviation="8" />
+    </filter>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0099CC" />
+      <stop offset="100%" style="stop-color:#7C3AED" />
+    </linearGradient>
+  </defs>
+
+  <rect width="900" height="200" fill="#ffffff" rx="12" />
+
+  <ellipse cx="450" cy="80" rx="180" ry="35" fill="url(#glow)" filter="url(#blur)" opacity="0.3">
+    <animate attributeName="rx" values="180;190;180" dur="3s" repeatCount="indefinite" />
+  </ellipse>
+
+  <rect x="250" y="50" width="400" height="60" rx="30" fill="url(#pill)" stroke="#d0d0d0" stroke-width="1" />
+
+  <circle cx="310" cy="72" r="6" fill="#D97706">
+    <animate attributeName="opacity" values="1;0.6;1" dur="2s" repeatCount="indefinite" />
+  </circle>
+  <circle cx="330" cy="72" r="6" fill="#10B981">
+    <animate attributeName="opacity" values="1;0.6;1" dur="2.5s" repeatCount="indefinite" />
+  </circle>
+  <circle cx="350" cy="72" r="6" fill="#6366F1">
+    <animate attributeName="opacity" values="1;0.6;1" dur="1.8s" repeatCount="indefinite" />
+  </circle>
+  <circle cx="370" cy="72" r="6" fill="#EC4899">
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="2.2s" repeatCount="indefinite" />
+  </circle>
+
+  <text x="310" y="96" font-family="monospace" font-size="8" fill="#999" text-anchor="middle">Claude</text>
+  <text x="330" y="96" font-family="monospace" font-size="8" fill="#999" text-anchor="middle">Codex</text>
+  <text x="350" y="96" font-family="monospace" font-size="8" fill="#999" text-anchor="middle">Gemini</text>
+  <text x="370" y="96" font-family="monospace" font-size="8" fill="#999" text-anchor="middle">Cursor</text>
+
+  <rect x="420" y="64" width="80" height="20" rx="10" fill="rgba(217,119,6,0.1)" stroke="#D9770640" stroke-width="0.5" />
+  <text x="460" y="78" font-family="monospace" font-size="10" fill="#D97706" text-anchor="middle">1 waiting</text>
+  <text x="550" y="78" font-family="monospace" font-size="11" fill="#999">4 ▼</text>
+
+  <text x="450" y="180" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', monospace" font-size="28" fill="url(#textGrad)" text-anchor="middle" font-weight="bold">Vibe Island</text>
+  <text x="450" y="196" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">A Dynamic Island for your AI coding tools</text>
+</svg>

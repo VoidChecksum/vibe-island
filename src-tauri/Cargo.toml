@@ -1,0 +1,48 @@
+[package]
+name = "vibe-island"
+version = "1.0.0"
+description = "A Dynamic Island for your AI coding tools"
+authors = ["VoidChecksum"]
+edition = "2021"
+
+[lib]
+name = "vibe_island_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-shell = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-positioner = "2"
+tauri-plugin-autostart = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+uuid = { version = "1", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+dirs = "6"
+notify = "7"
+rodio = "0.20"
+toml = "0.8"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+thiserror = "2"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+# Wayland layer-shell support
+# gtk4-layer-shell = "0.4"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+cocoa = "0.26"
+objc = "0.2"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows = { version = "0.58", features = ["Win32_Foundation", "Win32_UI_WindowsAndMessaging"] }
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

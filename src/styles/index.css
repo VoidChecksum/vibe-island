@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: transparent;
+  }
+}
+
+/* Drag region for window movement */
+[data-tauri-drag-region] {
+  -webkit-app-region: drag;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+  border-radius: 2px;
+}
+
+/* Tool icon colors */
+.tool-claude { color: #D97706; }
+.tool-codex { color: #10B981; }
+.tool-gemini { color: #6366F1; }
+.tool-cursor { color: #EC4899; }
+.tool-copilot { color: #8B5CF6; }
+.tool-opencode { color: #06B6D4; }
+.tool-windsurf { color: #14B8A6; }
+.tool-default { color: #9CA3AF; }

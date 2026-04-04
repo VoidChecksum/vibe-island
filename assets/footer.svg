@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 60">
+  <defs>
+    <linearGradient id="line" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0D1117;stop-opacity:1" />
+      <stop offset="20%" style="stop-color:#00D4FF;stop-opacity:0.6" />
+      <stop offset="50%" style="stop-color:#A78BFA;stop-opacity:0.6" />
+      <stop offset="80%" style="stop-color:#00D4FF;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#0D1117;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="900" height="60" fill="transparent" />
+  <line x1="50" y1="15" x2="850" y2="15" stroke="url(#line)" stroke-width="1" />
+  <text x="450" y="40" font-family="monospace" font-size="11" fill="#555" text-anchor="middle">Built with Tauri v2 + React + Rust — No license, no telemetry, no limits</text>
+  <text x="450" y="54" font-family="monospace" font-size="9" fill="#444" text-anchor="middle">GPL-3.0 License · github.com/VoidChecksum/vibe-island</text>
+</svg>
