@@ -68,9 +68,6 @@
     }
   },
   "plugins": {
-    "shell": { "open": true },
-    "notification": { "all": true },
-    "global-shortcut": { "all": true },
-    "autostart": { "all": true }
+    "shell": { "open": true }
   }
 }
