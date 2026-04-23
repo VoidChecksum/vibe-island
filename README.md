@@ -2,15 +2,15 @@
 
 <p align="center">
   <b>A Dynamic Island for your AI coding tools.</b><br/>
-  <sub>Monitor sessions · Approve permissions · Jump to terminal · Sound effects · Zero config</sub>
+  <sub>Monitor sessions · Approve permissions · Jump to any terminal · Sound effects · Zero config</sub>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Tauri-v2-FFC131?style=for-the-badge&logo=tauri&logoColor=white&labelColor=0D1117" alt="Tauri" />
   <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white&labelColor=0D1117" alt="React" />
   <img src="https://img.shields.io/badge/Rust-2021-DEA584?style=for-the-badge&logo=rust&logoColor=white&labelColor=0D1117" alt="Rust" />
-  <img src="https://img.shields.io/badge/AI_Tools-9+-00D4FF?style=for-the-badge&labelColor=0D1117" alt="Tools" />
-  <img src="https://img.shields.io/badge/Platforms-3-34D399?style=for-the-badge&labelColor=0D1117" alt="Platforms" />
+  <img src="https://img.shields.io/badge/AI_Tools-11+-00D4FF?style=for-the-badge&labelColor=0D1117" alt="Tools" />
+  <img src="https://img.shields.io/badge/Terminals-13+-34D399?style=for-the-badge&labelColor=0D1117" alt="Terminals" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/GPL--3.0-license-8B949E?style=for-the-badge&labelColor=0D1117" alt="License" /></a>
 </p>
 
@@ -32,7 +32,7 @@
   <img src="assets/og.png" alt="Vibe Island Preview" width="800" />
 </p>
 
-A floating notch panel that sits at the top of your screen and monitors all your AI coding sessions — Claude Code, Codex, Gemini, Cursor, and more. See which agents are running, approve permissions without switching windows, and jump to the exact terminal tab with one click.
+A floating notch panel that sits at the top of your screen and monitors all your AI coding sessions — Claude Code, Codex, Gemini, Cursor, Amp, Kimi, Kiro, and more. See which agents are running, approve permissions without switching windows, and jump to the exact terminal tab with one click.
 
 <table>
 <tr>
@@ -72,21 +72,21 @@ A single floating pill at the top of your screen shows everything at a glance:
 
 ### 👁️ Session Monitoring
 
-See all active AI coding sessions in a compact pill. Status indicators show what each agent is doing right now.
+See all active AI coding sessions in a compact pill. Pixel-art pet shows status. Per-session tool + terminal badges, elapsed time, and live tool activity.
 
 </td>
 <td width="33%" align="center">
 
 ### 🔐 Permission Approval
 
-Approve or deny tool use directly from the floating panel. Supports held connections — the AI tool waits for your decision.
+Approve or deny tool use directly from the panel. Diff rendering for Edit/Write tools. Numbered options for Ask questions. Keyboard shortcuts `⌘Y` / `⌘N`.
 
 </td>
 <td width="33%" align="center">
 
 ### 🎯 Jump to Terminal
 
-Click any session to jump to the exact terminal tab, tmux pane, or IDE window where it's running.
+Click any session to jump to the exact terminal — iTerm2, Ghostty, Warp, Kitty, Alacritty, GNOME Terminal, Konsole, WezTerm, tmux, VS Code, Cursor, and more.
 
 </td>
 </tr>
@@ -95,21 +95,21 @@ Click any session to jump to the exact terminal tab, tmux pane, or IDE window wh
 
 ### 🔊 Sound Effects
 
-Audible notifications when agents need attention. Custom sound packs via the PeonPing registry.
+Audible notifications when agents need attention. Custom sound packs supported.
 
 </td>
 <td width="33%" align="center">
 
-### ⌨️ Global Shortcuts
+### ⚙️ Smart Behavior
 
-Keyboard shortcuts for approve-all, deny-all, toggle panel, and bypass permissions.
+Dwell-time auto-collapse, expand on hover, hide when empty, bypass permission pill, click-outside dismiss.
 
 </td>
 <td width="33%" align="center">
 
 ### 🔧 Zero Config
 
-Auto-detects and installs hooks for all supported AI tools on first launch. No manual setup needed.
+Auto-installs hooks for all supported AI tools on first launch. Protocol `vi-e7c4`, OSC2 title caching, fallback socket path.
 
 </td>
 </tr>
@@ -117,19 +117,64 @@ Auto-detects and installs hooks for all supported AI tools on first launch. No m
 
 ---
 
-## Supported Tools
+## Supported AI Tools
 
 | Tool | Integration | Hook Type | Status |
 |------|-------------|-----------|--------|
-| <img src="https://img.shields.io/badge/-Claude_Code-D97706?style=flat-square&logoColor=white" /> | Full (sessions, permissions, questions) | Python hook | ✅ |
-| <img src="https://img.shields.io/badge/-OpenAI_Codex-10B981?style=flat-square&logoColor=white" /> | Full (sessions, permissions, app-server) | Python hook | ✅ |
-| <img src="https://img.shields.io/badge/-Google_Gemini-6366F1?style=flat-square&logoColor=white" /> | Full (sessions, permissions) | Python hook | ✅ |
-| <img src="https://img.shields.io/badge/-Cursor-EC4899?style=flat-square&logoColor=white" /> | Full (sessions, permissions) | Python hook | ✅ |
-| <img src="https://img.shields.io/badge/-OpenCode-06B6D4?style=flat-square&logoColor=white" /> | Full (sessions, permissions, questions) | JS plugin | ✅ |
-| <img src="https://img.shields.io/badge/-Windsurf-14B8A6?style=flat-square&logoColor=white" /> | Basic (session monitoring) | URI handler | ✅ |
-| <img src="https://img.shields.io/badge/-Copilot-8B5CF6?style=flat-square&logoColor=white" /> | Basic (session monitoring) | Config injection | ✅ |
-| <img src="https://img.shields.io/badge/-CodeBuddy-F59E0B?style=flat-square&logoColor=white" /> | Basic (session monitoring) | Config injection | ✅ |
-| <img src="https://img.shields.io/badge/-Qoder-EF4444?style=flat-square&logoColor=white" /> | Basic (session monitoring) | Config injection | ✅ |
+| **Claude Code** | Full (sessions, permissions, questions, OSC2) | Python hook | ✅ |
+| **OpenAI Codex** | Full (sessions, permissions, app-server) | Python hook | ✅ |
+| **Google Gemini CLI** | Full (sessions, permissions) | Python hook | ✅ |
+| **Cursor** | Full (sessions, permissions) | Python hook | ✅ |
+| **OpenCode** | Full (sessions, permissions, questions) | JS plugin | ✅ |
+| **Amp** | Full (session/agent/tool events) | JS plugin | ✅ |
+| **Kimi Code** | Full (sessions, tool events) | TOML inject | ✅ |
+| **Kiro** | Full (session/tool events) | JSON agent | ✅ |
+| **Droid** | Session monitoring | Config inject | ✅ |
+| **Hermes** | Full (session/tool events) | JS plugin | ✅ |
+| **Windsurf** | Session monitoring | URI handler | ✅ |
+| **Copilot** | Session monitoring | Config inject | ✅ |
+| **CodeBuddy** | Session monitoring | Config inject | ✅ |
+| **Qoder** | Session monitoring | Config inject | ✅ |
+
+---
+
+## Supported Terminals (Jump-to-Terminal)
+
+Terminal focus uses TTY→PID resolution — works for **any** terminal without per-app configuration.
+
+| Terminal | macOS | Linux X11 | Linux Wayland |
+|----------|-------|-----------|---------------|
+| **iTerm2** | AppleScript by TTY | — | — |
+| **Terminal.app** | AppleScript by TTY | — | — |
+| **Ghostty** | Sentinel file | `xdotool --pid` | `hyprctl` / `swaymsg` |
+| **Warp** | Bundle ID activate | `xdotool --pid` | `swaymsg` |
+| **Kitty** | `kitty@` remote | `xdotool --pid` | `swaymsg` |
+| **Alacritty** | — | `xdotool --pid` | `swaymsg` / `hyprctl` |
+| **WezTerm** | — | `xdotool --pid` | `swaymsg` / `hyprctl` |
+| **GNOME Terminal** | — | `xdotool --pid` | XWayland / `swaymsg` |
+| **Konsole** | — | `xdotool --pid` / `wmctrl` | KDE XWayland |
+| **foot** | — | — | `swaymsg` |
+| **tmux** | pane by TTY | pane by TTY | pane by TTY |
+| **VS Code / Cursor** | URI handler extension | URI handler extension | URI handler extension |
+| **Hyper / xterm** | — | `xdotool --pid` | XWayland |
+
+### How Jump Works
+
+```
+Session TTY path
+      │
+      ▼
+/proc/*/fd/0 readlink  ──► terminal emulator PID
+      │
+      ▼
+Compositor dispatch:
+  Hyprland  → hyprctl dispatch focuswindow pid:<pid>
+  Sway      → swaymsg '[pid=<pid>] focus'
+  KDE       → wmctrl -ip <pid>
+  X11       → xdotool search --pid <pid> windowactivate
+  tmux      → tmux select-pane -t <pane>
+  macOS     → AppleScript / bundle-id activate
+```
 
 ---
 
@@ -139,41 +184,41 @@ Auto-detects and installs hooks for all supported AI tools on first launch. No m
 <tr>
 <td width="25%" align="center">
 
-### <img src="https://img.shields.io/badge/-macOS-000000?style=for-the-badge&logo=apple&logoColor=white" />
+### macOS
 
-Native notch-aware positioning. Floats above all windows. System tray integration. `.dmg` installer.
-
-</td>
-<td width="25%" align="center">
-
-### <img src="https://img.shields.io/badge/-Windows-0078D6?style=for-the-badge&logo=windows11&logoColor=white" />
-
-Always-on-top floating panel. Named pipe IPC. System tray. `.msi` and `.exe` installers.
+Native notch-aware positioning. Floats above all windows. `.dmg` installer. iTerm2, Ghostty, Warp, Terminal.app, Kitty support.
 
 </td>
 <td width="25%" align="center">
 
-### <img src="https://img.shields.io/badge/-Linux_X11-FCC624?style=for-the-badge&logo=linux&logoColor=black" />
+### Windows
 
-X11 dock-type window. Always-on-top. AppIndicator tray. `.deb`, `.rpm`, `.AppImage`.
+Always-on-top floating panel. Named pipe IPC. System tray. `.msi` / `.exe` installers.
 
 </td>
 <td width="25%" align="center">
 
-### <img src="https://img.shields.io/badge/-Hyprland-58E1FF?style=for-the-badge&logo=wayland&logoColor=white" />
+### Linux X11
 
-Auto-applies window rules via `hyprctl`. Pinned, floating, borderless. Native Wayland.
+`xdotool --pid` for universal terminal focus. AppIndicator tray. `.deb`, `.rpm`, `.AppImage`.
+
+</td>
+<td width="25%" align="center">
+
+### Linux Wayland
+
+Hyprland (`hyprctl`), Sway (`swaymsg`), KDE (`wmctrl`), GNOME (XWayland). Auto-detected at runtime.
 
 </td>
 </tr>
 </table>
 
-### Hyprland Integration
+### Hyprland Setup
 
-Vibe Island auto-applies window rules via `hyprctl` on startup. You can also add them to `~/.config/hypr/hyprland.conf`:
+Vibe Island auto-applies window rules on startup. To make them permanent:
 
 ```ini
-# Vibe Island — Dynamic Island panel
+# ~/.config/hypr/hyprland.conf
 windowrulev2 = float, class:^(vibe-island)$
 windowrulev2 = pin, class:^(vibe-island)$
 windowrulev2 = noborder, class:^(vibe-island)$
@@ -189,14 +234,9 @@ windowrulev2 = move 33% 0, class:^(vibe-island)$
 ### Install
 
 ```bash
-# Clone
 git clone https://github.com/VoidChecksum/vibe-island.git
 cd vibe-island
-
-# Install dependencies
-npm install  # or bun install
-
-# Build
+npm install
 npx tauri build
 ```
 
@@ -207,7 +247,8 @@ npx tauri build
 
 ```bash
 sudo apt install libwebkit2gtk-4.1-dev build-essential curl wget file \
-  libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev libasound2-dev
+  libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev libasound2-dev \
+  wmctrl xdotool
 ```
 
 </details>
@@ -217,7 +258,7 @@ sudo apt install libwebkit2gtk-4.1-dev build-essential curl wget file \
 
 ```bash
 sudo pacman -S webkit2gtk-4.1 base-devel curl wget file libxdotool \
-  openssl libayatana-appindicator librsvg alsa-lib
+  openssl libayatana-appindicator librsvg alsa-lib wmctrl
 ```
 
 </details>
@@ -241,11 +282,9 @@ Install [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cp
 ### Development
 
 ```bash
-# Dev mode with hot reload
 npx tauri dev
-
-# The notch panel appears at the top of your screen
-# Hook scripts are auto-installed on first launch
+# Hook scripts auto-install on first launch
+# Socket: ~/.vibe-island/run/vibe-island.sock
 ```
 
 ### Build Output
@@ -269,52 +308,53 @@ npx tauri dev
 │                         │                                       │
 │  ┌─────────────────┐    │    ┌──────────────────────┐           │
 │  │  SocketServer   │    │    │    NotchPanel         │           │
-│  │  /tmp/vibe-     │◄───┼───►│    ├─ SessionRow      │           │
-│  │  island.sock    │    │    │    ├─ ApprovalCard     │           │
-│  └────────┬────────┘    │    │    └─ QuestionPrompt   │           │
+│  │  ~/.vibe-island │◄───┼───►│    ├─ SessionRow      │           │
+│  │  /run/*.sock    │    │    │    ├─ ApprovalCard     │           │
+│  └────────┬────────┘    │    │    └─ PixelPet         │           │
 │           │             │    └──────────────────────┘           │
 │  ┌────────▼────────┐    │    ┌──────────────────────┐           │
 │  │  SessionStore   │    │    │    SettingsPanel      │           │
-│  │  (Arc<Mutex>)   │────┼───►│    └─ Platform info    │           │
-│  └────────┬────────┘    │    └──────────────────────┘           │
+│  │  (Arc<RwLock>)  │────┼───►│    Behavior/Display/  │           │
+│  └────────┬────────┘    │    │    Integrations/Adv.  │           │
+│           │             │    └──────────────────────┘           │
+│  ┌────────▼────────┐    │                                       │
+│  │  HookInstaller  │    │    State: Zustand                     │
+│  │  14 tools       │    │    IPC: Tauri events + commands       │
+│  │  Claude/Codex/  │    │    UI: Tailwind + Framer Motion       │
+│  │  Amp/Kimi/Kiro  │    │    Proto: vi-e7c4, OSC2 cache        │
+│  └────────┬────────┘    │                                       │
 │           │             │                                       │
-│  ┌────────▼────────┐    │    ┌──────────────────────┐           │
-│  │  HookInstaller  │    │    │    OnboardingScreen   │           │
-│  │  Claude/Codex/  │    │    │    └─ Hook setup       │           │
-│  │  Gemini/Cursor  │    │    └──────────────────────┘           │
-│  └─────────────────┘    │                                       │
-│  ┌─────────────────┐    │    State: Zustand                     │
-│  │  SoundManager   │    │    IPC: Tauri events + commands       │
-│  │  (rodio)        │    │    UI: Tailwind + Framer Motion       │
-│  └─────────────────┘    │                                       │
-│  ┌─────────────────┐    │                                       │
+│  ┌────────▼────────┐    │                                       │
 │  │  Platform       │    │                                       │
-│  │  macOS/Win/     │    │                                       │
-│  │  Linux/Hyprland │    │                                       │
+│  │  jump_to_       │    │                                       │
+│  │  terminal()     │    │                                       │
+│  │  13+ terminals  │    │                                       │
 │  └─────────────────┘    │                                       │
 ├─────────────────────────┴───────────────────────────────────────┤
-│  Communication: Hook scripts → Unix socket → Tauri IPC → React  │
+│  Hook → ~/.vibe-island/run/vibe-island.sock → Tauri IPC → React │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ### Data Flow
 
 ```
-AI Tool ─── hook.py ─── /tmp/vibe-island.sock ─── SessionStore ─── React UI
-                        (named pipe on Windows)        │
-                                                       ▼
-                                              Tauri emit("session-update")
+AI Tool ── hook.py/js ── ~/.vibe-island/run/vibe-island.sock ── SessionStore ── React UI
+            (proto vi-e7c4)    (fallback /tmp/vibe-island.sock)       │
+                                                                       ▼
+                                                              Tauri emit("session-update")
+                                                                       │
+                                                              OSC2 cache → jump_to_terminal()
 ```
 
 ### Event Types
 
 | Event | Direction | Description |
 |-------|-----------|-------------|
-| `SessionStart` | Hook → App | New AI coding session started |
+| `SessionStart` | Hook → App | New AI session started |
 | `SessionEnd` | Hook → App | Session terminated |
 | `UserPromptSubmit` | Hook → App | User sent a prompt |
 | `PreToolUse` | Hook → App | Tool about to execute |
-| `PostToolUse` | Hook → App | Tool execution completed |
+| `PostToolUse` | Hook → App | Tool completed |
 | `PermissionRequest` | Hook ↔ App | Tool needs approval (held connection) |
 | `Stop` | Hook → App | Session went idle |
 
@@ -324,57 +364,55 @@ AI Tool ─── hook.py ─── /tmp/vibe-island.sock ─── SessionStore
 
 ```
 vibe-island/
-├── assets/                 SVG banners and graphics
-├── src-tauri/              Rust backend (Tauri v2)
+├── src-tauri/
 │   ├── src/
 │   │   ├── lib.rs              App entry, Tauri commands
-│   │   ├── main.rs             Binary entry point
 │   │   ├── sessions/mod.rs     Session state machine + models
-│   │   ├── socket/mod.rs       Unix socket / named pipe server
-│   │   ├── hooks/mod.rs        Hook installer (5 tools, 4 scripts)
-│   │   ├── config/mod.rs       Persistent configuration
-│   │   ├── sound/mod.rs        Audio playback (rodio, cross-platform)
-│   │   └── platform/mod.rs     OS-specific (macOS/Win/Linux/Hyprland)
-│   ├── icons/                  App icons (all sizes)
-│   └── Cargo.toml              Rust dependencies
-├── src/                    React frontend
-│   ├── App.tsx                 Root component
-│   ├── main.tsx                Entry point
+│   │   ├── socket/mod.rs       Unix socket server
+│   │   ├── hooks/mod.rs        Hook installer (14 tools, proto vi-e7c4)
+│   │   ├── config/mod.rs       Persistent config (14 fields)
+│   │   ├── sound/mod.rs        Audio (rodio)
+│   │   └── platform/mod.rs     jump_to_terminal(), 13+ terminals
+│   ├── resources/
+│   │   └── terminal-focus/     VS Code extension (URI handler)
+│   └── Cargo.toml
+├── src/
 │   ├── components/
 │   │   ├── notch/
-│   │   │   ├── NotchPanel.tsx      The Dynamic Island panel
-│   │   │   └── SessionRow.tsx      Per-session row with status
+│   │   │   ├── NotchPanel.tsx      Dynamic Island, dwell-time collapse
+│   │   │   ├── SessionRow.tsx      Session row, terminal badge, bypass pill
+│   │   │   └── PixelPet.tsx        Pixel-art status character
 │   │   ├── approval/
-│   │   │   └── ApprovalCard.tsx    Permission approval UI
-│   │   ├── settings/
-│   │   │   └── SettingsPanel.tsx   Full settings interface
-│   │   └── onboarding/
-│   │       └── OnboardingScreen.tsx First-run setup
-│   ├── store/useStore.ts       Zustand state management
-│   ├── types/index.ts          TypeScript types + constants
-│   └── styles/index.css        Tailwind CSS
-├── package.json
-├── tailwind.config.js
-├── vite.config.ts
-└── tsconfig.json
+│   │   │   └── ApprovalCard.tsx    Diff view, inline Q&A, ⌘Y/⌘N
+│   │   └── settings/
+│   │       └── SettingsPanel.tsx   All toggles + uninstall
+│   ├── store/useStore.ts
+│   ├── types/index.ts          14 tools, all config types
+│   └── styles/index.css
+└── package.json
 ```
 
 ---
 
 ## Configuration
 
-Settings are stored in `~/.config/vibe-island/config.json`:
+`~/.config/vibe-island/config.json`:
 
 ```json
 {
-  "display": { "position": "top-center", "opacity": 0.95 },
-  "layout": { "style": "clean", "show_tool_names": true },
-  "shortcuts": {
-    "toggle_panel": "CmdOrCtrl+Shift+V",
-    "approve_all": "CmdOrCtrl+Shift+A"
+  "display": { "monitor": "primary", "position": "top-center", "opacity": 0.95 },
+  "layout": {
+    "style": "clean",
+    "show_tool_names": true,
+    "dwell_time_secs": 4.0,
+    "expand_on_hover": true,
+    "hide_when_empty": false,
+    "expand_on_subagent_done": false,
+    "click_outside_dismisses": false,
+    "notch_follows_active_window": false,
+    "auto_configure_terminal_titles": false
   },
-  "sound": { "enabled": true, "volume": 0.5, "pack": "default" },
-  "monitored_tools": ["claude", "codex", "gemini", "cursor", "opencode"]
+  "sound": { "enabled": true, "volume": 0.5 }
 }
 ```
 
@@ -385,11 +423,12 @@ Settings are stored in `~/.config/vibe-island/config.json`:
 | Layer | Technology | Why |
 |-------|-----------|-----|
 | Backend | **Rust** + Tauri v2 | ~5MB binary, native performance, cross-platform |
-| Frontend | **React 19** + TypeScript | Component model, ecosystem, DX |
-| Styling | **Tailwind CSS** + Framer Motion | Utility-first, smooth animations |
+| Frontend | **React 19** + TypeScript | Component model, strict types |
+| Styling | **Tailwind CSS** + Framer Motion | Utility-first, spring animations |
 | State | **Zustand** | Lightweight, no boilerplate |
-| Audio | **rodio** (Rust) | Cross-platform audio, pure Rust |
-| IPC | **Unix socket** / Named pipe | Same protocol as original, zero overhead |
+| Audio | **rodio** (Rust) | Cross-platform, pure Rust |
+| IPC | **Unix socket** / Named pipe | Protocol `vi-e7c4`, `0x3A7F` compat |
+| Terminal Focus | **TTY→PID→compositor** | Universal — works for all 13+ terminals |
 | Build | **Vite** + Cargo | Fast HMR, incremental Rust builds |
 
 ---
@@ -397,17 +436,13 @@ Settings are stored in `~/.config/vibe-island/config.json`:
 ## Contributing
 
 ```bash
-# Fork & clone
 git clone https://github.com/YOUR_USERNAME/vibe-island.git
-
-# Install deps
+cd vibe-island
 npm install
 cargo check --manifest-path src-tauri/Cargo.toml
-
-# Dev mode
 npx tauri dev
 
-# Run TypeScript checks
+# Type checks
 npx tsc --noEmit
 ```
 
