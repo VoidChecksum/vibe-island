@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/Tauri-v2-FFC131?style=for-the-badge&logo=tauri&logoColor=white&labelColor=0D1117" alt="Tauri" />
   <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white&labelColor=0D1117" alt="React" />
   <img src="https://img.shields.io/badge/Rust-2021-DEA584?style=for-the-badge&logo=rust&logoColor=white&labelColor=0D1117" alt="Rust" />
-  <img src="https://img.shields.io/badge/AI_Tools-11+-00D4FF?style=for-the-badge&labelColor=0D1117" alt="Tools" />
+  <img src="https://img.shields.io/badge/AI_Tools-16+-00D4FF?style=for-the-badge&labelColor=0D1117" alt="Tools" />
   <img src="https://img.shields.io/badge/Terminals-13+-34D399?style=for-the-badge&labelColor=0D1117" alt="Terminals" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/GPL--3.0-license-8B949E?style=for-the-badge&labelColor=0D1117" alt="License" /></a>
 </p>
@@ -26,7 +26,12 @@
 ## What is Vibe Island?
 
 <p align="center">
-  <img src="assets/og.png" alt="Vibe Island Preview" width="800" />
+  <img src="assets/og.png" alt="Vibe Island Preview" width="860" />
+</p>
+
+<p align="center">
+  <img src="src/assets/brand/onboarding-wallpaper.jpg" alt="Onboarding wallpaper" width="430" />
+  <img src="assets/terminal.png" alt="Terminal integration preview" width="360" />
 </p>
 
 A floating notch panel that sits at the top of your screen and monitors all your AI coding sessions — Claude Code, Codex, Gemini, Cursor, Amp, Kimi, Kiro, and more. See which agents are running, approve permissions without switching windows, and jump to the exact terminal tab with one click.
@@ -58,6 +63,37 @@ A single floating pill at the top of your screen shows everything at a glance:
 </td>
 </tr>
 </table>
+
+### Visual Workflow
+
+<table>
+<tr>
+<td align="center" width="25%">
+  <img src="src/assets/brand/extension-icon.png" width="52" alt="Launch" /><br/>
+  <b>1. Launch</b><br/>
+  <sub>First-run setup installs hooks and shows a DMG-style guided onboarding.</sub>
+</td>
+<td align="center" width="25%">
+  <img src="src/assets/brand/cursor-pixel.png" width="52" alt="Watch" /><br/>
+  <b>2. Watch</b><br/>
+  <sub>The top notch tracks sessions, subagents, tools, terminal, and elapsed time.</sub>
+</td>
+<td align="center" width="25%">
+  <span style="font-size:44px">🔐</span><br/>
+  <b>3. Decide</b><br/>
+  <sub>Approve once, always allow, deny, answer questions, or enable Auto Mode.</sub>
+</td>
+<td align="center" width="25%">
+  <span style="font-size:44px">🎯</span><br/>
+  <b>4. Jump</b><br/>
+  <sub>Click a row to focus the exact terminal, tab, tmux pane, IDE, or compositor window.</sub>
+</td>
+</tr>
+</table>
+
+<p align="center">
+  <b>Dynamic Island shape</b> · <b>inline permissions</b> · <b>terminal focus</b> · <b>sound alerts</b> · <b>labs controls</b> · <b>usage telemetry UI</b>
+</p>
 
 ---
 
@@ -106,7 +142,7 @@ Dwell-time auto-collapse, expand on hover, hide when empty, bypass permission pi
 
 ### 🔧 Zero Config
 
-Auto-installs hooks for all supported AI tools on first launch. Protocol `vi-e7c4`, OSC2 title caching, fallback socket path.
+Auto-installs hooks for all supported AI tools on first launch. Protocol `vi-e7c4`, OSC2 title caching, fallback socket path, and first-run onboarding assets from the desktop app.
 
 </td>
 </tr>
@@ -115,6 +151,10 @@ Auto-installs hooks for all supported AI tools on first launch. Protocol `vi-e7c
 ---
 
 ## Supported AI Tools
+
+<p align="center">
+  <img src="src/assets/brand/extension-icon.png" alt="Extension icon" width="80" />
+</p>
 
 | Tool | Integration | Hook Type | Status |
 |------|-------------|-----------|--------|
@@ -132,6 +172,8 @@ Auto-installs hooks for all supported AI tools on first launch. Protocol `vi-e7c
 | **Copilot** | Session monitoring | Config inject | ✅ |
 | **CodeBuddy** | Session monitoring | Config inject | ✅ |
 | **Qoder** | Session monitoring | Config inject | ✅ |
+| **Cline** | Session monitoring | Config inject | ✅ |
+| **π CLI** | Session monitoring | Config inject | ✅ |
 
 ---
 
@@ -314,6 +356,46 @@ npx tauri dev
 
 ---
 
+## UI Anatomy
+
+<table>
+<tr>
+<td width="50%">
+
+```text
+┌──────────────────────────────────────┐
+│  ▣ Vibe Island        ● 1 waiting    │  compact pill
+├──────────────────────────────────────┤
+│  🟠 auth-module   Claude  iTerm  12m │
+│     You: refactor login flow          │
+│     Edit(src/auth/session.ts)         │
+│                                      │
+│  ⚠ Permission Request                 │
+│    Bash npm run test                  │
+│    [Deny ⌘N]     [Allow ⌘Y]          │
+│           Always Allow                │
+└──────────────────────────────────────┘
+```
+
+</td>
+<td width="50%">
+
+- Compact notch when idle.
+- Expands on hover or when a tool asks.
+- Parent sessions and subagents group together.
+- Inline approval cards render command details and file diffs.
+- Settings expose Behaviour, Display, Usage, Sound, CLI Hooks, Terminal, Labs, Community, Advanced.
+
+</td>
+</tr>
+</table>
+
+<p align="center">
+  <img src="src/assets/brand/wechat-group-qr.jpg" alt="WeChat group QR" width="130" />
+  &nbsp;&nbsp;
+  <img src="src/assets/brand/feishu-group-qr.png" alt="Feishu group QR" width="130" />
+</p>
+
 ## Architecture
 
 <p align="center">
@@ -355,13 +437,15 @@ vibe-island/
 │   │   ├── sessions/mod.rs     Session state machine + models
 │   │   ├── socket/mod.rs       Unix socket server
 │   │   ├── hooks/mod.rs        Hook installer (14 tools, proto vi-e7c4)
-│   │   ├── config/mod.rs       Persistent config (14 fields)
-│   │   ├── sound/mod.rs        Audio (rodio)
+│   │   ├── config/mod.rs       Persistent config: display, labs, usage, terminal, sound
+│   │   ├── sound/mod.rs        Audio (rodio) + bundled ceremony sound
 │   │   └── platform/mod.rs     jump_to_terminal(), 13+ terminals
 │   ├── resources/
+│   │   ├── Sounds/             Built-in notification sounds
 │   │   └── terminal-focus/     VS Code extension (URI handler)
 │   └── Cargo.toml
 ├── src/
+│   ├── assets/brand/           Wallpaper, QR, icon, Departure Mono font
 │   ├── components/
 │   │   ├── notch/
 │   │   │   ├── NotchPanel.tsx      Dynamic Island, dwell-time collapse
@@ -369,10 +453,12 @@ vibe-island/
 │   │   │   └── PixelPet.tsx        Pixel-art status character
 │   │   ├── approval/
 │   │   │   └── ApprovalCard.tsx    Diff view, inline Q&A, ⌘Y/⌘N
+│   │   ├── onboarding/
+│   │   │   └── OnboardingScreen.tsx DMG-style first-run setup
 │   │   └── settings/
-│   │       └── SettingsPanel.tsx   All toggles + uninstall
+│   │       └── SettingsPanel.tsx   Sidebar settings: usage, labs, sound, terminal, hooks
 │   ├── store/useStore.ts
-│   ├── types/index.ts          14 tools, all config types
+│   ├── types/index.ts          16 tools, all config types
 │   └── styles/index.css
 └── package.json
 ```
@@ -397,7 +483,15 @@ vibe-island/
     "notch_follows_active_window": false,
     "auto_configure_terminal_titles": false
   },
-  "sound": { "enabled": true, "volume": 0.5 }
+  "sound": {
+    "enabled": true,
+    "volume": 0.5,
+    "pack": "builtin-8bit",
+    "events": { "permission_request": true, "input_required": true }
+  },
+  "usage": { "show_usage_limits": true, "provider": "auto", "value_mode": "remaining" },
+  "labs": { "auto_mode": false, "cursor_approval": true, "codex_desktop_alerts": true },
+  "terminal": { "warp_tab_jump": true, "disable_click_to_jump": false }
 }
 ```
 
@@ -411,7 +505,7 @@ vibe-island/
 | Frontend | **React 19** + TypeScript | Component model, strict types |
 | Styling | **Tailwind CSS** + Framer Motion | Utility-first, spring animations |
 | State | **Zustand** | Lightweight, no boilerplate |
-| Audio | **rodio** (Rust) | Cross-platform, pure Rust |
+| Audio | **rodio** (Rust) + bundled WAV | Cross-platform, built-in notification pack |
 | IPC | **Unix socket** / Named pipe | Protocol `vi-e7c4`, `0x3A7F` compat |
 | Terminal Focus | **TTY→PID→compositor** | Universal — works for all 13+ terminals |
 | Build | **Vite** + Cargo | Fast HMR, incremental Rust builds |

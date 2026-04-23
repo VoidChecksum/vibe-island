@@ -2,6 +2,11 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 
+use crate::config::SoundConfig;
+
+const ONBOARDING_CEREMONY_WAV: &[u8] =
+    include_bytes!("../../resources/Sounds/onboarding-ceremony.wav");
+
 /// Sound manager — plays event sounds and manages sound packs
 pub struct SoundManager {
     enabled: bool,
@@ -11,10 +16,43 @@ pub struct SoundManager {
 
 impl SoundManager {
     pub fn new() -> Self {
-        Self {
+        let mut manager = Self {
             enabled: true,
             volume: 0.5,
             sounds: HashMap::new(),
+        };
+        manager.load_builtin();
+        manager
+    }
+
+    pub fn from_config(config: &SoundConfig) -> Self {
+        let mut manager = Self::new();
+        manager.configure(config);
+        manager
+    }
+
+    pub fn configure(&mut self, config: &SoundConfig) {
+        self.enabled = config.enabled;
+        self.volume = config.volume.clamp(0.0, 1.0);
+        if config.pack == "builtin-8bit" || config.pack == "default" {
+            self.load_builtin();
+        }
+    }
+
+    fn load_builtin(&mut self) {
+        let sound = ONBOARDING_CEREMONY_WAV.to_vec();
+        for name in [
+            "onboarding-ceremony",
+            "session_start",
+            "session_end",
+            "permission_request",
+            "approval",
+            "error",
+            "input_required",
+            "resource_limit",
+            "task_complete",
+        ] {
+            self.sounds.insert(name.to_string(), sound.clone());
         }
     }
 
@@ -24,15 +62,18 @@ impl SoundManager {
         }
 
         // Use rodio for cross-platform audio
-        let (_stream, stream_handle) = rodio::OutputStream::try_default()
-            .map_err(|e| format!("Audio output error: {}", e))?;
+        let (_stream, stream_handle) =
+            rodio::OutputStream::try_default().map_err(|e| format!("Audio output error: {}", e))?;
 
-        if let Some(data) = self.sounds.get(sound_name) {
+        if let Some(data) = self
+            .sounds
+            .get(sound_name)
+            .or_else(|| self.sounds.get("onboarding-ceremony"))
+        {
             let cursor = std::io::Cursor::new(data.clone());
-            let source = rodio::Decoder::new(cursor)
-                .map_err(|e| format!("Decode error: {}", e))?;
-            let sink = rodio::Sink::try_new(&stream_handle)
-                .map_err(|e| format!("Sink error: {}", e))?;
+            let source = rodio::Decoder::new(cursor).map_err(|e| format!("Decode error: {}", e))?;
+            let sink =
+                rodio::Sink::try_new(&stream_handle).map_err(|e| format!("Sink error: {}", e))?;
             sink.set_volume(self.volume);
             sink.append(source);
             sink.sleep_until_end();
@@ -53,6 +94,7 @@ impl SoundManager {
         self.sounds.clear();
 
         if !pack_path.exists() {
+            self.load_builtin();
             return Ok(());
         }
 
@@ -70,6 +112,10 @@ impl SoundManager {
                     }
                 }
             }
+        }
+
+        if self.sounds.is_empty() {
+            self.load_builtin();
         }
 
         Ok(())

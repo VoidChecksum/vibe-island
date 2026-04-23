@@ -1,6 +1,6 @@
 {
   "name": "@voidchecksum/vibe-island",
-  "version": "1.0.0",
+  "version": "1.0.29",
   "description": "Dynamic Island for your AI coding tools — monitor Claude Code, Codex, Gemini, Cursor and more from a floating notch panel",
   "type": "module",
   "bin": {

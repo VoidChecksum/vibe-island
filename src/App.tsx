@@ -1,8 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStore } from "./store/useStore";
 import { NotchPanel } from "./components/notch/NotchPanel";
+import { SettingsPanel } from "./components/settings/SettingsPanel";
+import { OnboardingScreen } from "./components/onboarding/OnboardingScreen";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
 
 interface UpdateInfo { version: string; body?: string; }
 
@@ -13,8 +17,31 @@ export default function App() {
   const answerQuestion = useStore((s) => s.answerQuestion);
   const [update, setUpdate] = useState<UpdateInfo | null>(null);
   const [installing, setInstalling] = useState(false);
+  const [windowLabel] = useState(() => getCurrentWebviewWindow().label);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    try {
+      return window.localStorage.getItem("vibe-island:onboarding-complete") !== "1";
+    } catch {
+      return false;
+    }
+  });
+  const lastWaitingKey = useRef("");
 
   useEffect(() => { init(); }, [init]);
+
+  useEffect(() => {
+    if (windowLabel !== "notch") return;
+    const win = getCurrentWindow();
+    if (showOnboarding) {
+      win.setSize(new LogicalSize(760, 720)).catch(() => {});
+      win.center().catch(() => {});
+      win.setShadow(true).catch(() => {});
+    } else {
+      win.setSize(new LogicalSize(420, 48)).catch(() => {});
+      win.center().catch(() => {});
+      win.setShadow(false).catch(() => {});
+    }
+  }, [showOnboarding, windowLabel]);
 
   // Listen for background update check result
   useEffect(() => {
@@ -50,6 +77,19 @@ export default function App() {
     return () => window.removeEventListener("keydown", handler);
   }, [sessions, approvePermission, answerQuestion]);
 
+  useEffect(() => {
+    const waitingSessions = sessions.filter((s) => s.status === "waiting_for_approval" || s.status === "waiting_for_answer");
+    const waitingKey = waitingSessions.map((s) => `${s.id}:${s.status}`).sort().join("|");
+    if (!waitingKey || waitingKey === lastWaitingKey.current) return;
+    lastWaitingKey.current = waitingKey;
+    const config = useStore.getState().config;
+    const eventName = waitingSessions.some((s) => s.status === "waiting_for_answer") ? "input_required" : "permission_request";
+    if (config?.sound?.enabled === false) return;
+    if (eventName === "input_required" && config?.sound?.events?.input_required === false) return;
+    if (eventName === "permission_request" && config?.sound?.events?.permission_request === false) return;
+    invoke("play_sound", { soundName: eventName }).catch(() => {});
+  }, [sessions]);
+
   const handleInstall = async () => {
     setInstalling(true);
     try {
@@ -59,6 +99,21 @@ export default function App() {
       setInstalling(false);
     }
   };
+
+  if (windowLabel === "settings") {
+    return <SettingsPanel />;
+  }
+
+  if (showOnboarding) {
+    return (
+      <OnboardingScreen
+        onComplete={() => {
+          try { window.localStorage.setItem("vibe-island:onboarding-complete", "1"); } catch {}
+          setShowOnboarding(false);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="w-screen h-screen flex justify-center">

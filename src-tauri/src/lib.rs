@@ -73,6 +73,7 @@ async fn update_config(
 ) -> Result<(), String> {
     let mut s = state.write().await;
     s.config = config.clone();
+    s.sound.configure(&config.sound);
     s.config.save().map_err(|e| e.to_string())
 }
 
@@ -183,10 +184,11 @@ pub fn run() {
     std::fs::create_dir_all(&osc2_dir).ok();
 
     let config = AppConfig::load().unwrap_or_default();
+    let sound = SoundManager::from_config(&config.sound);
     let state: SharedState = Arc::new(RwLock::new(AppState {
         sessions: SessionStore::new(),
         config,
-        sound: SoundManager::new(),
+        sound,
         ssh_remote: ssh_remote::SshRemoteManager::new(),
     }));
 

@@ -66,6 +66,10 @@ export interface AppConfig {
     notch_follows_active_window: boolean;
     auto_configure_terminal_titles: boolean;
     session_idle_cleanup_secs: number;
+    auto_collapse_on_leave: boolean;
+    task_complete_dwell_ms: number;
+    disable_click_to_jump: boolean;
+    panel_height: number;
   };
   shortcuts: {
     toggle_panel: string;
@@ -83,7 +87,41 @@ export interface AppConfig {
       permission_request: boolean;
       approval: boolean;
       error: boolean;
+      input_required: boolean;
+      resource_limit: boolean;
+      user_spam: boolean;
     };
+    quiet_hours: {
+      enabled: boolean;
+      start: string;
+      end: string;
+    };
+    filters: {
+      only_when_backgrounded: boolean;
+      suppress_repeated_events_secs: number;
+    };
+  };
+  usage: {
+    show_usage_limits: boolean;
+    provider: string;
+    value_mode: string;
+  };
+  labs: {
+    beta_updates: boolean;
+    auto_mode: boolean;
+    cursor_approval: boolean;
+    codex_desktop_alerts: boolean;
+    kiro_hints: boolean;
+  };
+  terminal: {
+    disable_click_to_jump: boolean;
+    warp_tab_jump: boolean;
+    disable_claude_native_title: boolean;
+    custom_jump_rules: Array<{
+      name: string;
+      bundle_id: string;
+      command: string;
+    }>;
   };
   monitored_tools: string[];
 }
@@ -103,6 +141,8 @@ export const TOOL_COLORS: Record<string, string> = {
   kimi: "#EC4899",
   kiro: "#F59E0B",
   hermes: "#10B981",
+  cline: "#22D3EE",
+  "pi-cli": "#F97316",
 };
 
 export const TOOL_LABELS: Record<string, string> = {
@@ -120,4 +160,6 @@ export const TOOL_LABELS: Record<string, string> = {
   kimi: "Kimi",
   kiro: "Kiro",
   hermes: "Hermes",
+  cline: "Cline",
+  "pi-cli": "π CLI",
 };

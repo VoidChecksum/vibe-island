@@ -2,10 +2,14 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { invoke } from "@tauri-apps/api/core";
 import { useStore } from "../../store/useStore";
+import wallpaperUrl from "../../assets/brand/onboarding-wallpaper.jpg";
+import extensionIconUrl from "../../assets/brand/extension-icon.png";
+import ceremonyUrl from "../../assets/sounds/onboarding-ceremony.wav";
 
 const STEPS = [
   {
     title: "A Dynamic Island for your AI coding tools",
+    eyebrow: "Vibe Island",
     features: [
       "Permissions at a glance",
       "Click to jump to the right window",
@@ -14,18 +18,20 @@ const STEPS = [
   },
   {
     title: "Everything. One glance.",
+    eyebrow: "15 hours saved",
     features: [
-      "See all your AI agent sessions",
-      "Approve permissions without switching",
-      "Jump to the exact terminal tab",
+      "You have 4 agents running",
+      "One of them has been waiting for you",
+      "Approve without switching tabs",
     ],
   },
   {
     title: "Your Environment",
+    eyebrow: "Zero config",
     features: [
-      "Claude Code, Codex, Gemini, Cursor",
-      "Windsurf, Copilot, OpenCode, and more",
-      "Works on macOS, Windows, and Linux",
+      "Claude Code, Codex, Gemini, Cursor, Kiro",
+      "Windsurf, Copilot, OpenCode, Droid, Amp, Kimi",
+      "Restart running sessions, or start a new one",
     ],
   },
 ];
@@ -44,6 +50,7 @@ export function OnboardingScreen({ onComplete }: Props) {
   const handleFinish = async () => {
     setInstalling(true);
     try {
+      new Audio(ceremonyUrl).play().catch(() => {});
       await invoke("install_hooks");
     } catch (e) {
       console.error("Hook install error:", e);
@@ -53,8 +60,14 @@ export function OnboardingScreen({ onComplete }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-island-bg flex items-center justify-center">
-      <div className="max-w-md w-full px-8">
+    <div
+      className="fixed inset-0 flex items-center justify-center overflow-hidden"
+      style={{
+        background: `linear-gradient(180deg, rgba(0,0,0,.50), rgba(0,0,0,.94)), url(${wallpaperUrl}) center/cover`,
+      }}
+    >
+      <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/80 to-transparent" />
+      <div className="max-w-md w-full px-8 relative">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
@@ -63,15 +76,26 @@ export function OnboardingScreen({ onComplete }: Props) {
             exit={{ opacity: 0, x: -20 }}
             className="text-center"
           >
-            {/* Island preview */}
-            <div className="mx-auto mb-8 w-48 h-12 rounded-island bg-island-surface border border-island-border flex items-center justify-center">
-              <div className="flex gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#D97706]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#6366F1]" />
+            <div className="mx-auto mb-7 w-56 rounded-[22px] border border-white/10 bg-black/90 shadow-2xl shadow-black/60 overflow-hidden">
+              <div className="h-10 px-4 flex items-center gap-2">
+                <img src={extensionIconUrl} alt="" className="w-5 h-5 rounded-md" />
+                <span className="text-[11px] font-semibold text-white/90">Vibe Island</span>
+                <span className="ml-auto flex items-center gap-1 text-[9px] text-orange-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
+                  1 waiting
+                </span>
+              </div>
+              <div className="border-t border-white/10 px-3 py-2">
+                <div className="flex items-center gap-2 text-[10px] text-white/70">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span>Claude · Codex · Gemini · Cursor</span>
+                </div>
               </div>
             </div>
 
+            <p className="text-[11px] uppercase tracking-[0.22em] text-white/45 mb-3">
+              {STEPS[step].eyebrow}
+            </p>
             <h2 className="text-xl font-semibold text-island-text mb-4">
               {STEPS[step].title}
             </h2>

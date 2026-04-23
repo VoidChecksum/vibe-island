@@ -1,6 +1,6 @@
 [package]
 name = "vibe-island"
-version = "1.0.0"
+version = "1.0.29"
 description = "A Dynamic Island for your AI coding tools"
 authors = ["VoidChecksum"]
 edition = "2021"

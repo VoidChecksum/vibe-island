@@ -2,7 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+@font-face {
+  font-family: "Departure Mono";
+  src: url("../assets/brand/DepartureMono-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 @layer base {
   * {
@@ -36,7 +42,7 @@
   --notch-text: #ffffff;
   --notch-muted: rgba(255, 255, 255, 0.4);
   --notch-radius: 14px;
-  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', ui-monospace, monospace;
+  --font-mono: 'Departure Mono', 'JetBrains Mono', 'SF Mono', 'Fira Code', ui-monospace, monospace;
 }
 
 /* Drag region */

@@ -45,7 +45,7 @@ function terminalName(session: Session): string | null {
 }
 
 export function SessionRow({ session, isHero = false }: Props) {
-  const { jumpToTerminal, toggleBypass, bypassSessions } = useStore();
+  const { jumpToTerminal, toggleBypass, bypassSessions, config } = useStore();
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number } | null>(null);
   const toolLabel = TOOL_LABELS[session.source] || session.source;
   const projectName = session.cwd?.split("/").pop() || session.cwd?.split("\\").pop() || "";
@@ -64,6 +64,8 @@ export function SessionRow({ session, isHero = false }: Props) {
     session.env?.BYPASS_PERMISSIONS === "1";
 
   const termName = terminalName(session);
+  const clickToJumpDisabled = config?.layout?.disable_click_to_jump || config?.terminal?.disable_click_to_jump;
+  const showAutoMode = config?.labs?.auto_mode ?? true;
 
   const elapsed = () => {
     const ms = Date.now() - new Date(session.started_at).getTime();
@@ -88,9 +90,9 @@ export function SessionRow({ session, isHero = false }: Props) {
   return (
     <div
       className={`sess-card${!isHero ? " sess-mini" : ""}${isDone && isHero ? " sess-done" : ""}`}
-      onClick={() => { setCtxMenu(null); jumpToTerminal(session.id); }}
+      onClick={() => { setCtxMenu(null); if (!clickToJumpDisabled) jumpToTerminal(session.id); }}
       onContextMenu={handleCtxMenu}
-      title={`Click to jump to ${toolLabel} terminal`}
+      title={clickToJumpDisabled ? `${toolLabel} session` : `Click to jump to ${toolLabel} terminal`}
     >
       {ctxMenu && (
         <div
@@ -111,7 +113,7 @@ export function SessionRow({ session, isHero = false }: Props) {
         >
           {[
             { label: "Jump to Terminal", action: () => { jumpToTerminal(session.id); setCtxMenu(null); } },
-            { label: isBypass ? "Disable Auto Mode" : "Enable Auto Mode", action: () => { toggleBypass(session.id); setCtxMenu(null); } },
+            ...(showAutoMode ? [{ label: isBypass ? "Disable Auto Mode" : "Enable Auto Mode", action: () => { toggleBypass(session.id); setCtxMenu(null); } }] : []),
           ].map(item => (
             <button
               key={item.label}
