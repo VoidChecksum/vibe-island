@@ -77,7 +77,20 @@ export function SessionRow({ session, isHero = false }: Props) {
       title={`Click to jump to ${toolLabel} terminal`}
     >
       <div className="sess-pet">
-        <PixelPet status={session.status} size={16} />
+        {isHero
+          ? <PixelPet status={session.status} size={16} />
+          : <div
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: "50%",
+                background: session.status === "waiting_for_approval" || session.status === "waiting_for_answer"
+                  ? "var(--vi-alert)"
+                  : "var(--vi-idle)",
+                flexShrink: 0,
+              }}
+            />
+        }
       </div>
 
       <div className="sess-info">
