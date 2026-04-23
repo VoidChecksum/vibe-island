@@ -103,22 +103,23 @@ export function ApprovalCard({ session }: Props) {
             {options.map((opt, i) => (
               <button
                 key={i}
-                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-[6px] text-left transition-all"
+                className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-[6px] text-left transition-all"
                 style={{
-                  background: selectedOption === i ? "rgba(192,132,252,0.2)" : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${selectedOption === i ? "rgba(192,132,252,0.4)" : "rgba(255,255,255,0.06)"}`,
+                  background: selectedOption === i ? "rgba(6,182,212,0.25)" : "rgba(6,182,212,0.15)",
                   cursor: "pointer",
+                  fontSize: "10px",
+                  fontWeight: 400,
+                  color: "rgba(255,255,255,0.9)",
                 }}
                 data-no-drag
                 onClick={() => handleOptionClick(i)}
               >
                 <span
-                  className="text-[9px] px-1.5 py-0.5 rounded font-mono"
-                  style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)" }}
+                  className="font-mono text-[9px] opacity-50"
                 >
-                  #{i + 1}
+                  ⌘{i + 1}
                 </span>
-                <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.8)" }}>{opt}</span>
+                <span>{opt}</span>
               </button>
             ))}
           </div>
@@ -151,14 +152,14 @@ export function ApprovalCard({ session }: Props) {
           data-no-drag
           onClick={() => approvePermission(session.id, "deny")}
         >
-          Deny <span style={{ opacity: 0.4, fontSize: "9px" }}>⌘⌫</span>
+          Deny <span style={{ opacity: 0.5 }}>⌘N</span>
         </button>
         <button
           className="approve-btn allow flex-1"
           data-no-drag
           onClick={() => approvePermission(session.id, "allow")}
         >
-          Allow <span style={{ opacity: 0.4, fontSize: "9px" }}>⌘Y</span>
+          Allow <span style={{ opacity: 0.5 }}>⌘Y</span>
         </button>
       </div>
 
