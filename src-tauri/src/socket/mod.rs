@@ -20,7 +20,11 @@ impl SocketServer {
     }
 
     fn socket_path() -> PathBuf {
-        PathBuf::from("/tmp/vibe-island.sock")
+        let run_dir = dirs::home_dir()
+            .unwrap_or_else(|| PathBuf::from("/tmp"))
+            .join(".vibe-island/run");
+        std::fs::create_dir_all(&run_dir).ok();
+        run_dir.join("vibe-island.sock")
     }
 
     pub async fn start(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {

@@ -28,6 +28,13 @@ pub struct LayoutConfig {
     pub show_session_time: bool,
     pub show_cwd: bool,
     pub max_visible_sessions: usize,
+    pub dwell_time_secs: f32,
+    pub expand_on_hover: bool,
+    pub hide_when_empty: bool,
+    pub expand_on_subagent_done: bool,
+    pub click_outside_dismisses: bool,
+    pub notch_follows_active_window: bool,
+    pub auto_configure_terminal_titles: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -72,6 +79,13 @@ impl Default for AppConfig {
                 show_session_time: true,
                 show_cwd: false,
                 max_visible_sessions: 8,
+                dwell_time_secs: 4.0,
+                expand_on_hover: true,
+                hide_when_empty: false,
+                expand_on_subagent_done: false,
+                click_outside_dismisses: false,
+                notch_follows_active_window: false,
+                auto_configure_terminal_titles: false,
             },
             shortcuts: ShortcutConfig {
                 toggle_panel: "CmdOrCtrl+Shift+V".into(),

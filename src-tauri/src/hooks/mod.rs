@@ -1,6 +1,26 @@
 use std::fs;
 use std::path::PathBuf;
 
+fn remove_managed_block(content: &str, sentinel: &str) -> String {
+    let start = format!("# --- {} START", sentinel);
+    let end = format!("# --- {} END", sentinel);
+    let mut result = String::new();
+    let mut skip = false;
+    for line in content.lines() {
+        if line.trim_start().starts_with(&start) {
+            skip = true;
+        }
+        if !skip {
+            result.push_str(line);
+            result.push('\n');
+        }
+        if skip && line.trim_start().starts_with(&end) {
+            skip = false;
+        }
+    }
+    result
+}
+
 /// Installs hook scripts for all supported AI coding tools
 pub struct HookInstaller;
 
@@ -37,6 +57,27 @@ impl HookInstaller {
         match Self::install_opencode_plugin(&home) {
             Ok(msg) => results.push(msg),
             Err(e) => results.push(format!("OpenCode: {}", e)),
+        }
+
+        match Self::install_amp_plugin(&home) {
+            Ok(msg) => results.push(msg),
+            Err(e) => results.push(format!("Amp: {}", e)),
+        }
+        match Self::install_kimi_hook(&home) {
+            Ok(msg) => results.push(msg),
+            Err(e) => results.push(format!("Kimi: {}", e)),
+        }
+        match Self::install_kiro_hook(&home) {
+            Ok(msg) => results.push(msg),
+            Err(e) => results.push(format!("Kiro: {}", e)),
+        }
+        match Self::install_droid_hook(&home) {
+            Ok(msg) => results.push(msg),
+            Err(e) => results.push(format!("Droid: {}", e)),
+        }
+        match Self::install_hermes_plugin(&home) {
+            Ok(msg) => results.push(msg),
+            Err(e) => results.push(format!("Hermes: {}", e)),
         }
 
         Ok(results)
@@ -185,61 +226,273 @@ impl HookInstaller {
 
         Ok("OpenCode: plugin installed".into())
     }
+
+    fn install_amp_plugin(home: &PathBuf) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        let plugin_dir = home.join(".amp/plugins");
+        let plugin_path = plugin_dir.join("vibe-island.js");
+        fs::create_dir_all(&plugin_dir)?;
+        fs::write(&plugin_path, AMP_PLUGIN_JS)?;
+        Ok("Amp: plugin installed".into())
+    }
+
+    fn install_kimi_hook(home: &PathBuf) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        let config_path = home.join(".kimi/config.toml");
+        fs::create_dir_all(home.join(".kimi"))?;
+        let hook_path = home.join(".kimi/vibe-island-hook.py");
+        fs::write(&hook_path, GEMINI_HOOK_PY)?;
+        let existing = if config_path.exists() {
+            fs::read_to_string(&config_path)?
+        } else {
+            String::new()
+        };
+        if !existing.contains("vibe-island Kimi hooks START") {
+            let block = format!(
+                "\n# --- vibe-island Kimi hooks START (managed, do not edit) ---\n[hooks]\npre_tool_call = \"python3 {}\"\npost_tool_call = \"python3 {}\"\n# --- vibe-island Kimi hooks END ---\n",
+                hook_path.display(), hook_path.display()
+            );
+            let mut content = existing;
+            content.push_str(&block);
+            fs::write(&config_path, content)?;
+        }
+        Ok("Kimi: hooks installed".into())
+    }
+
+    fn install_kiro_hook(home: &PathBuf) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        let agents_dir = home.join(".kiro/agents");
+        if !home.join(".kiro").exists() {
+            return Ok("Kiro: not installed, skipped".into());
+        }
+        fs::create_dir_all(&agents_dir)?;
+        let hook_path = home.join(".kiro/vibe-island-hook.py");
+        fs::write(&hook_path, CLAUDE_HOOK_PY)?;
+        let agent_path = agents_dir.join("vibe-island.json");
+        fs::write(&agent_path, serde_json::to_string_pretty(&serde_json::json!({
+            "name": "vibe-island",
+            "description": "Vibe Island session monitor",
+            "hooks": {
+                "on_tool_call": format!("python3 {}", hook_path.display()),
+                "on_session_start": format!("python3 {}", hook_path.display()),
+                "on_session_end": format!("python3 {}", hook_path.display())
+            }
+        }))?)?;
+        Ok("Kiro: agent hooks installed".into())
+    }
+
+    fn install_droid_hook(home: &PathBuf) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        if !home.join(".droid").exists() {
+            return Ok("Droid: not installed, skipped".into());
+        }
+        let config_path = home.join(".droid/config.json");
+        let hook_path = home.join(".droid/vibe-island-hook.py");
+        fs::write(&hook_path, CLAUDE_HOOK_PY)?;
+        let mut config: serde_json::Value = if config_path.exists() {
+            let content = fs::read_to_string(&config_path)?;
+            serde_json::from_str(&content).unwrap_or(serde_json::json!({}))
+        } else { serde_json::json!({}) };
+        let obj = config.as_object_mut().ok_or("not an object")?;
+        obj.entry("vibe_island_hook").or_insert(serde_json::json!(format!("python3 {}", hook_path.display())));
+        fs::write(&config_path, serde_json::to_string_pretty(&config)?)?;
+        Ok("Droid: hooks installed".into())
+    }
+
+    fn install_hermes_plugin(home: &PathBuf) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        let plugin_dir = home.join(".hermes/plugins");
+        let plugin_path = plugin_dir.join("vibe-island");
+        fs::create_dir_all(&plugin_dir)?;
+        fs::write(&plugin_path, HERMES_PLUGIN_JS)?;
+        Ok("Hermes: plugin installed".into())
+    }
+
+    pub fn uninstall_all() -> Result<Vec<String>, Box<dyn std::error::Error + Send + Sync>> {
+        let mut results = Vec::new();
+        let home = dirs::home_dir().ok_or("No home directory")?;
+
+        let _ = fs::remove_file(home.join(".claude/vibe-island-hook.py"));
+        let settings_path = home.join(".claude/settings.json");
+        if settings_path.exists() {
+            if let Ok(content) = fs::read_to_string(&settings_path) {
+                if let Ok(mut settings) = serde_json::from_str::<serde_json::Value>(&content) {
+                    if let Some(hooks) = settings.get_mut("hooks").and_then(|h| h.as_object_mut()) {
+                        for event in &["PreToolUse", "PostToolUse", "Notification", "Stop"] {
+                            if let Some(arr) = hooks.get_mut(*event).and_then(|v| v.as_array_mut()) {
+                                arr.retain(|e| e.get("command").and_then(|c| c.as_str())
+                                    .map(|c| !c.contains("vibe-island")).unwrap_or(true));
+                            }
+                        }
+                    }
+                    let _ = fs::write(&settings_path, serde_json::to_string_pretty(&settings).unwrap_or_default());
+                }
+            }
+        }
+        results.push("Claude Code: uninstalled".into());
+
+        let _ = fs::remove_file(home.join(".codex/vibe-island-hook.py"));
+        results.push("Codex: uninstalled".into());
+
+        let _ = fs::remove_file(home.join(".gemini/vibe-island-hook.py"));
+        results.push("Gemini: uninstalled".into());
+
+        let _ = fs::remove_file(home.join(".config/opencode/plugins/vibe-island.js"));
+        results.push("OpenCode: uninstalled".into());
+
+        let _ = fs::remove_file(home.join(".amp/plugins/vibe-island.js"));
+        results.push("Amp: uninstalled".into());
+
+        let kimi_config = home.join(".kimi/config.toml");
+        if kimi_config.exists() {
+            if let Ok(content) = fs::read_to_string(&kimi_config) {
+                let cleaned = remove_managed_block(&content, "vibe-island Kimi hooks");
+                let _ = fs::write(&kimi_config, cleaned);
+            }
+        }
+        let _ = fs::remove_file(home.join(".kimi/vibe-island-hook.py"));
+        results.push("Kimi: uninstalled".into());
+
+        let _ = fs::remove_file(home.join(".kiro/agents/vibe-island.json"));
+        let _ = fs::remove_file(home.join(".kiro/vibe-island-hook.py"));
+        results.push("Kiro: uninstalled".into());
+
+        let _ = fs::remove_file(home.join(".droid/vibe-island-hook.py"));
+        results.push("Droid: uninstalled".into());
+
+        let _ = fs::remove_file(home.join(".hermes/plugins/vibe-island"));
+        results.push("Hermes: uninstalled".into());
+
+        for cli in &["code", "cursor", "windsurf"] {
+            let _ = std::process::Command::new(cli)
+                .args(["--uninstall-extension", "vibe-island.terminal-focus"])
+                .output();
+        }
+        results.push("VS Code extensions: uninstalled".into());
+
+        Ok(results)
+    }
 }
 
 /// Claude Code / Cursor hook script (Python)
 const CLAUDE_HOOK_PY: &str = r#"#!/usr/bin/env python3
-"""Vibe Island hook — forwards events to /tmp/vibe-island.sock"""
-import json, os, socket, sys
+"""Vibe Island hook — forwards events to ~/.vibe-island/run/vibe-island.sock"""
+import json, os, socket, sys, subprocess
 
-SOCKET_PATH = "/tmp/vibe-island.sock"
-if sys.platform == "win32":
-    SOCKET_PATH = r"\\.\pipe\vibe-island"
+_PROTO_REV = "vi-e7c4"
+_COMPAT = 0x3A7F
 
-def send_event(data):
+SOCKET_PATH = os.path.expanduser("~/.vibe-island/run/vibe-island.sock")
+FALLBACK_SOCKET = "/tmp/vibe-island.sock"
+OSC2_DIR = os.path.expanduser("~/.vibe-island/cache/osc2-titles")
+
+def get_tty():
     try:
-        if sys.platform == "win32":
-            import win32file
-            handle = win32file.CreateFile(
-                SOCKET_PATH, win32file.GENERIC_WRITE, 0, None,
-                win32file.OPEN_EXISTING, 0, None)
-            win32file.WriteFile(handle, json.dumps(data).encode())
-            win32file.CloseHandle(handle)
-        else:
-            s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            s.settimeout(3)
-            s.connect(SOCKET_PATH)
-            s.sendall(json.dumps(data).encode())
-            s.close()
+        if os.isatty(0):
+            return os.ttyname(0)
     except Exception:
         pass
+    try:
+        pid = os.getpid()
+        out = subprocess.check_output(["ps", "-o", "tty=", "-p", str(pid)], timeout=1).decode().strip()
+        if out and out not in ("??", "?"):
+            return "/dev/" + out
+    except Exception:
+        pass
+    return None
+
+def write_osc2(session_id, cwd, user_text):
+    try:
+        os.makedirs(OSC2_DIR, exist_ok=True)
+        prefix = session_id[:16]
+        project = (cwd or "").rstrip("/").rsplit("/", 1)[-1] or "session"
+        prompt_preview = (user_text or "")[:30]
+        title = (project + ": " + prompt_preview) if prompt_preview else project
+        with open(os.path.join(OSC2_DIR, prefix), "w") as f:
+            f.write(title)
+    except Exception:
+        pass
+
+def send_event(data, held=False):
+    for path in [SOCKET_PATH, FALLBACK_SOCKET]:
+        try:
+            s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            s.settimeout(300 if held else 3)
+            s.connect(path)
+            s.sendall(json.dumps(data).encode())
+            if held:
+                chunks = []
+                while True:
+                    chunk = s.recv(4096)
+                    if not chunk:
+                        break
+                    chunks.append(chunk)
+                s.close()
+                return b"".join(chunks).decode() if chunks else None
+            s.close()
+            return True
+        except Exception:
+            continue
+    return None
 
 def main():
     hook_event = os.environ.get("CLAUDE_HOOK_EVENT", os.environ.get("HOOK_EVENT", ""))
     session_id = os.environ.get("CLAUDE_SESSION_ID", os.environ.get("SESSION_ID", ""))
     cwd = os.environ.get("CLAUDE_CWD", os.environ.get("CWD", os.getcwd()))
     tool_name = os.environ.get("CLAUDE_TOOL_NAME", os.environ.get("TOOL_NAME", ""))
+    tool_input_raw = os.environ.get("CLAUDE_TOOL_INPUT", "{}")
+    user_prompt = os.environ.get("CLAUDE_USER_PROMPT", "")
 
+    stdin_data = {}
     if not hook_event or not session_id:
         try:
-            data = json.load(sys.stdin)
-            hook_event = data.get("hook_event_name", data.get("type", ""))
-            session_id = data.get("session_id", "")
-            cwd = data.get("cwd", cwd)
-            tool_name = data.get("tool_name", tool_name)
+            stdin_data = json.load(sys.stdin)
+            hook_event = stdin_data.get("hook_event_name", stdin_data.get("type", ""))
+            session_id = stdin_data.get("session_id", "")
+            cwd = stdin_data.get("cwd", cwd)
+            tool_name = stdin_data.get("tool_name", tool_name)
+            tool_input_raw = json.dumps(stdin_data.get("tool_input", {}))
+            user_prompt = stdin_data.get("prompt", user_prompt)
         except Exception:
             return
+
+    if not hook_event or not session_id:
+        return
+
+    try:
+        tool_input = json.loads(tool_input_raw) if tool_input_raw else {}
+    except Exception:
+        tool_input = {}
+
+    tty = get_tty()
+    is_held = hook_event in ("PreToolUse",) and tool_name == "AskUserQuestion"
+    is_perm = hook_event == "PreToolUse" and tool_name not in ("", None, "AskUserQuestion")
+
+    if hook_event == "UserPromptSubmit" and user_prompt:
+        write_osc2(session_id, cwd, user_prompt)
+
+    env_snapshot = {k: v for k, v in os.environ.items()
+                    if k.startswith(("TERM", "TMUX", "SSH_", "HYPRLAND", "WAYLAND", "XDG_", "DISPLAY", "COLORTERM", "CLAUDE_BYPASS", "BYPASS_PERM"))}
 
     event = {
         "session_id": session_id,
         "hook_event_name": hook_event,
         "cwd": cwd,
         "tool_name": tool_name,
+        "tool_input": tool_input,
+        "prompt": user_prompt or None,
+        "_proto_rev": _PROTO_REV,
+        "_compat": _COMPAT,
         "_source": "claude",
         "_ppid": os.getpid(),
-        "_tty": os.ttyname(0) if hasattr(os, "ttyname") and os.isatty(0) else None,
+        "_tty": tty,
+        "_env": env_snapshot,
     }
-    send_event(event)
+
+    result = send_event(event, held=(is_held or is_perm))
+    if result and isinstance(result, str):
+        try:
+            resp = json.loads(result)
+            decision = resp.get("hookSpecificOutput", {}).get("decision", {})
+            if decision:
+                print(json.dumps(resp))
+        except Exception:
+            pass
 
 if __name__ == "__main__":
     main()
@@ -250,41 +503,35 @@ const CODEX_HOOK_PY: &str = r#"#!/usr/bin/env python3
 """Vibe Island hook for Codex CLI"""
 import json, os, socket, sys
 
-SOCKET_PATH = "/tmp/vibe-island.sock"
+_PROTO_REV = "vi-e7c4"
+_COMPAT = 0x3A7F
+SOCKET_PATH = os.path.expanduser("~/.vibe-island/run/vibe-island.sock")
+FALLBACK_SOCKET = "/tmp/vibe-island.sock"
 
 def send_event(data):
-    try:
-        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        s.settimeout(3)
-        s.connect(SOCKET_PATH)
-        s.sendall(json.dumps(data).encode())
-        s.close()
-    except Exception:
-        pass
+    for path in [SOCKET_PATH, FALLBACK_SOCKET]:
+        try:
+            s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            s.settimeout(3)
+            s.connect(path)
+            s.sendall(json.dumps(data).encode())
+            s.close()
+            return
+        except Exception:
+            continue
 
 def main():
     try:
         data = json.load(sys.stdin)
     except Exception:
         return
-
     event_type = data.get("type", "")
-    event_map = {
-        "session.start": "SessionStart",
-        "session.end": "SessionEnd",
-        "tool.start": "PreToolUse",
-        "tool.end": "PostToolUse",
-    }
+    event_map = {"session.start": "SessionStart", "session.end": "SessionEnd",
+                 "tool.start": "PreToolUse", "tool.end": "PostToolUse"}
     hook_event = event_map.get(event_type, event_type)
-
-    event = {
-        "session_id": data.get("session_id", ""),
-        "hook_event_name": hook_event,
-        "cwd": data.get("cwd", os.getcwd()),
-        "tool_name": data.get("tool_name", ""),
-        "_source": "codex",
-        "_ppid": os.getpid(),
-    }
+    event = {"session_id": data.get("session_id", ""), "hook_event_name": hook_event,
+             "cwd": data.get("cwd", os.getcwd()), "tool_name": data.get("tool_name", ""),
+             "_proto_rev": _PROTO_REV, "_compat": _COMPAT, "_source": "codex", "_ppid": os.getpid()}
     send_event(event)
 
 if __name__ == "__main__":
@@ -296,32 +543,32 @@ const GEMINI_HOOK_PY: &str = r#"#!/usr/bin/env python3
 """Vibe Island hook for Gemini CLI"""
 import json, os, socket, sys
 
-SOCKET_PATH = "/tmp/vibe-island.sock"
+_PROTO_REV = "vi-e7c4"
+_COMPAT = 0x3A7F
+SOCKET_PATH = os.path.expanduser("~/.vibe-island/run/vibe-island.sock")
+FALLBACK_SOCKET = "/tmp/vibe-island.sock"
 
 def send_event(data):
-    try:
-        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        s.settimeout(3)
-        s.connect(SOCKET_PATH)
-        s.sendall(json.dumps(data).encode())
-        s.close()
-    except Exception:
-        pass
+    for path in [SOCKET_PATH, FALLBACK_SOCKET]:
+        try:
+            s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            s.settimeout(3)
+            s.connect(path)
+            s.sendall(json.dumps(data).encode())
+            s.close()
+            return
+        except Exception:
+            continue
 
 def main():
     try:
         data = json.load(sys.stdin)
     except Exception:
         return
-
-    event = {
-        "session_id": data.get("session_id", f"gemini-{os.getpid()}"),
-        "hook_event_name": data.get("type", "SessionStart"),
-        "cwd": data.get("cwd", os.getcwd()),
-        "tool_name": data.get("tool_name", ""),
-        "_source": "gemini",
-        "_ppid": os.getpid(),
-    }
+    event = {"session_id": data.get("session_id", "gemini-" + str(os.getpid())),
+             "hook_event_name": data.get("type", "SessionStart"),
+             "cwd": data.get("cwd", os.getcwd()), "tool_name": data.get("tool_name", ""),
+             "_proto_rev": _PROTO_REV, "_compat": _COMPAT, "_source": "gemini", "_ppid": os.getpid()}
     send_event(event)
 
 if __name__ == "__main__":
@@ -423,5 +670,65 @@ export default async ({ client, serverUrl }) => {
       if (mapped) await sendToSocket(mapped);
     },
   };
+};
+"#;
+
+const AMP_PLUGIN_JS: &str = r#"// vibe-island — Amp agent lifecycle bridge
+import { connect } from "net";
+import os from "os";
+
+const SOCKET = os.homedir() + "/.vibe-island/run/vibe-island.sock";
+const FALLBACK = "/tmp/vibe-island.sock";
+const _PROTO_REV = "vi-e7c4";
+
+function send(e, d = {}) {
+    const p = JSON.stringify({ hook_event_name: e, _source: "amp", _ppid: process.pid,
+        _proto_rev: _PROTO_REV, ...d });
+    for (const path of [SOCKET, FALLBACK]) {
+        try {
+            const sock = connect({ path }, () => { sock.write(p); sock.end(); });
+            sock.on("error", () => {});
+            return;
+        } catch (_) {}
+    }
+}
+
+export default (amp) => {
+    const sid = () => amp.threadId || ("amp-" + process.pid);
+    amp.on("session.start", () => send("SessionStart", { session_id: sid(), cwd: process.cwd() }));
+    amp.on("agent.start", () => send("PreToolUse", { session_id: sid(), tool_name: "Agent" }));
+    amp.on("agent.end", () => send("Stop", { session_id: sid() }));
+    amp.on("tool.call", (ev) => send("PreToolUse", { session_id: sid(), tool_name: ev.tool || "" }));
+    amp.on("tool.result", (ev) => send("PostToolUse", { session_id: sid(), tool_name: ev.tool || "" }));
+};
+"#;
+
+const HERMES_PLUGIN_JS: &str = r#"// vibe-island — Hermes agent lifecycle event bridge
+import { connect } from "net";
+import os from "os";
+
+const SOCKET = os.homedir() + "/.vibe-island/run/vibe-island.sock";
+const FALLBACK = "/tmp/vibe-island.sock";
+const _PROTO_REV = "vi-e7c4";
+
+function send(e, d = {}) {
+    const p = JSON.stringify({ hook_event_name: e, _source: "hermes", _ppid: process.pid,
+        _proto_rev: _PROTO_REV, ...d });
+    for (const path of [SOCKET, FALLBACK]) {
+        try {
+            const sock = connect({ path }, () => { sock.write(p); sock.end(); });
+            sock.on("error", () => {});
+            return;
+        } catch (_) {}
+    }
+}
+
+export default (hermes) => {
+    const sid = () => hermes.sessionId || ("hermes-" + process.pid);
+    hermes.on("session.start", () => send("SessionStart", { session_id: sid(), cwd: process.cwd() }));
+    hermes.on("session.end", () => send("SessionEnd", { session_id: sid() }));
+    hermes.on("tool.call", (ev) => send("PreToolUse", { session_id: sid(), tool_name: ev.tool || "" }));
+    hermes.on("tool.result", (ev) => send("PostToolUse", { session_id: sid(), tool_name: ev.tool || "" }));
+    hermes.on("idle", () => send("Stop", { session_id: sid() }));
 };
 "#;

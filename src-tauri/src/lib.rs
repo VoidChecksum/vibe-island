@@ -11,6 +11,7 @@ use sound::SoundManager;
 use hooks::HookInstaller;
 use config::AppConfig;
 
+use std::path::PathBuf;
 use std::sync::Arc;
 use tauri::Manager;
 use tokio::sync::RwLock;
@@ -92,8 +93,38 @@ async fn get_platform_info() -> Result<platform::PlatformInfo, String> {
     Ok(platform::get_info())
 }
 
+#[tauri::command]
+async fn jump_to_terminal(
+    state: tauri::State<'_, SharedState>,
+    session_id: String,
+) -> Result<(), String> {
+    let s = state.read().await;
+    let sessions = s.sessions.list_async().await;
+    drop(s);
+    if let Some(session) = sessions.into_iter().find(|s| s.id == session_id) {
+        platform::jump_to_terminal(&session);
+    }
+    Ok(())
+}
+
+#[tauri::command]
+async fn uninstall_hooks() -> Result<String, String> {
+    let results = hooks::HookInstaller::uninstall_all().map_err(|e| e.to_string())?;
+    Ok(results.join("\n"))
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // Ensure run dir exists
+    let run_dir = dirs::home_dir()
+        .unwrap_or_else(|| PathBuf::from("/tmp"))
+        .join(".vibe-island/run");
+    std::fs::create_dir_all(&run_dir).ok();
+    let osc2_dir = dirs::home_dir()
+        .unwrap_or_else(|| PathBuf::from("/tmp"))
+        .join(".vibe-island/cache/osc2-titles");
+    std::fs::create_dir_all(&osc2_dir).ok();
+
     let config = AppConfig::load().unwrap_or_default();
     let state: SharedState = Arc::new(RwLock::new(AppState {
         sessions: SessionStore::new(),
@@ -120,6 +151,8 @@ pub fn run() {
             install_hooks,
             play_sound,
             get_platform_info,
+            jump_to_terminal,
+            uninstall_hooks,
         ])
         .setup(move |app| {
             let handle = app.handle().clone();
