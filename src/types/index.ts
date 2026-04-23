@@ -58,6 +58,13 @@ export interface AppConfig {
     show_session_time: boolean;
     show_cwd: boolean;
     max_visible_sessions: number;
+    dwell_time_secs: number;
+    expand_on_hover: boolean;
+    hide_when_empty: boolean;
+    expand_on_subagent_done: boolean;
+    click_outside_dismisses: boolean;
+    notch_follows_active_window: boolean;
+    auto_configure_terminal_titles: boolean;
   };
   shortcuts: {
     toggle_panel: string;
@@ -91,6 +98,10 @@ export const TOOL_COLORS: Record<string, string> = {
   codebuddy: "#F59E0B",
   qoder: "#EF4444",
   droid: "#84CC16",
+  amp: "#8B5CF6",
+  kimi: "#EC4899",
+  kiro: "#F59E0B",
+  hermes: "#10B981",
 };
 
 export const TOOL_LABELS: Record<string, string> = {
@@ -104,4 +115,8 @@ export const TOOL_LABELS: Record<string, string> = {
   codebuddy: "CodeBuddy",
   qoder: "Qoder",
   droid: "Droid",
+  amp: "Amp",
+  kimi: "Kimi",
+  kiro: "Kiro",
+  hermes: "Hermes",
 };
