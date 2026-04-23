@@ -228,7 +228,26 @@ windowrulev2 = move 33% 0, class:^(vibe-island)$
 
 ## Quick Start
 
-### Install
+### Option 1 — npx (hooks only, no build required)
+
+Install hooks for all your AI tools in one command:
+
+```bash
+npx vibe-island install
+```
+
+Then [download the app](#download) for your platform.
+
+### Option 2 — Download
+
+| Platform | Link |
+|----------|------|
+| macOS (universal) | [Vibe Island.dmg](https://github.com/VoidChecksum/vibe-island/releases/latest) |
+| Windows | [Vibe Island Setup.exe](https://github.com/VoidChecksum/vibe-island/releases/latest) |
+| Linux (AppImage) | [vibe-island.AppImage](https://github.com/VoidChecksum/vibe-island/releases/latest) |
+| Linux (.deb) | [vibe-island.deb](https://github.com/VoidChecksum/vibe-island/releases/latest) |
+
+### Option 3 — Build from source
 
 ```bash
 git clone https://github.com/VoidChecksum/vibe-island.git

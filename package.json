@@ -1,25 +1,63 @@
 {
   "name": "vibe-island",
-  "private": true,
   "version": "1.0.0",
+  "description": "Dynamic Island for your AI coding tools — monitor Claude Code, Codex, Gemini, Cursor and more from a floating notch panel",
   "type": "module",
+  "bin": {
+    "vibe-island": "./bin/vibe-island.mjs"
+  },
+  "files": [
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "tauri": "tauri"
   },
+  "keywords": [
+    "ai",
+    "claude",
+    "claude-code",
+    "codex",
+    "gemini",
+    "cursor",
+    "opencode",
+    "notch",
+    "dynamic-island",
+    "tauri",
+    "developer-tools",
+    "ai-agents",
+    "terminal",
+    "productivity"
+  ],
+  "author": "VoidChecksum",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VoidChecksum/vibe-island.git"
+  },
+  "homepage": "https://github.com/VoidChecksum/vibe-island#readme",
+  "bugs": {
+    "url": "https://github.com/VoidChecksum/vibe-island/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "@tauri-apps/api": "^2",
-    "@tauri-apps/plugin-shell": "^2",
-    "@tauri-apps/plugin-notification": "^2",
-    "@tauri-apps/plugin-global-shortcut": "^2",
-    "@tauri-apps/plugin-positioner": "^2",
+    "@tauri-apps/cli": "^2.10.1",
     "@tauri-apps/plugin-autostart": "^2",
-    "react": "^19",
-    "react-dom": "^19",
+    "@tauri-apps/plugin-global-shortcut": "^2",
+    "@tauri-apps/plugin-notification": "^2",
+    "@tauri-apps/plugin-positioner": "^2",
+    "@tauri-apps/plugin-shell": "^2",
     "framer-motion": "^11",
     "lucide-react": "^0.460",
+    "react": "^19",
+    "react-dom": "^19",
     "zustand": "^5"
   },
   "devDependencies": {
