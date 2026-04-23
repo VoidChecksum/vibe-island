@@ -70,26 +70,22 @@ export function SessionRow({ session, isHero = false }: Props) {
     return `${Math.floor(mins / 60)}h`;
   };
 
+  const dotColor = (() => {
+    if (session.status === "waiting_for_approval" || session.status === "waiting_for_answer") return "var(--vi-alert)";
+    if (isDone) return "var(--vi-idle)";
+    return "var(--vi-work)";
+  })();
+
   return (
     <div
-      className="sess-card"
+      className={`sess-card${!isHero ? " sess-mini" : ""}${isDone && isHero ? " sess-done" : ""}`}
       onClick={() => jumpToTerminal(session.id)}
       title={`Click to jump to ${toolLabel} terminal`}
     >
-      <div className="sess-pet">
+      <div className="sess-pet" style={{ display: "flex", alignItems: isHero ? "flex-start" : "center" }}>
         {isHero
           ? <PixelPet status={session.status} size={16} />
-          : <div
-              style={{
-                width: 7,
-                height: 7,
-                borderRadius: "50%",
-                background: session.status === "waiting_for_approval" || session.status === "waiting_for_answer"
-                  ? "var(--vi-alert)"
-                  : "var(--vi-idle)",
-                flexShrink: 0,
-              }}
-            />
+          : <div style={{ width: 6, height: 6, borderRadius: "50%", background: dotColor, flexShrink: 0 }} />
         }
       </div>
 
@@ -99,10 +95,7 @@ export function SessionRow({ session, isHero = false }: Props) {
           <span className="sess-tag">{toolLabel}</span>
           {termName && <span className="sess-tag">{termName}</span>}
           {isBypass && (
-            <span
-              className="sess-tag"
-              style={{ background: "rgba(249,115,22,0.15)", color: "var(--vi-alert)", fontSize: "9px" }}
-            >
+            <span className="sess-tag" style={{ background: "rgba(249,115,22,0.15)", color: "var(--vi-alert)" }}>
               bypass
             </span>
           )}
@@ -110,9 +103,7 @@ export function SessionRow({ session, isHero = false }: Props) {
         </div>
 
         {isHero && isDone && (
-          <div className="sess-you" style={{ color: "var(--vi-idle)" }}>
-            Done — click to jump
-          </div>
+          <div className="sess-you" style={{ color: "var(--vi-idle)" }}>Done — click to jump</div>
         )}
 
         {isHero && !isDone && session.last_user_text && (
@@ -120,11 +111,11 @@ export function SessionRow({ session, isHero = false }: Props) {
         )}
 
         {isHero && !isDone && session.tool_name && (
-          <div className="sess-you" style={{ color: "var(--vi-work)" }}>
+          <div className="sess-status">
             {session.tool_name}
             {session.tool_input && typeof session.tool_input === "object" &&
              (session.tool_input as Record<string, unknown>).file_path
-              ? ` ${String((session.tool_input as Record<string, unknown>).file_path)}`
+              ? `(${String((session.tool_input as Record<string, unknown>).file_path).split("/").pop()})`
               : session.tool_input && (session.tool_input as Record<string, unknown>).command
               ? ` ${String((session.tool_input as Record<string, unknown>).command).slice(0, 40)}`
               : ""}

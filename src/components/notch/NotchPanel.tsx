@@ -77,9 +77,9 @@ export function NotchPanel() {
     >
       <motion.div
         className="notch-shell"
-        animate={{ width: isExpanded ? 380 : "auto", borderRadius: isExpanded ? 18 : 22 }}
+        animate={{ width: isExpanded ? 380 : 240 }}
         transition={{ type: "spring", stiffness: 500, damping: 35 }}
-        style={{ minWidth: isExpanded ? 340 : 180, maxWidth: 400 }}
+        style={{ maxWidth: 400 }}
       >
         <div
           className="compact-pill"
