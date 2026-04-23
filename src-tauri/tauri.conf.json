@@ -70,7 +70,7 @@
   "plugins": {
     "shell": { "open": true },
     "updater": {
-      "pubkey": "",
+      "pubkey": "RWSh+fg2Wyrd+eZ81SmwSqKJqNUqRnnXisTIBMTpOwzuRSRsWxVAkn1k",
       "endpoints": [
         "https://github.com/VoidChecksum/vibe-island/releases/latest/download/latest.json"
       ],
