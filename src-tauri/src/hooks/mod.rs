@@ -80,6 +80,16 @@ impl HookInstaller {
             Err(e) => results.push(format!("Hermes: {}", e)),
         }
 
+        match Self::install_cline_hook(&home) {
+            Ok(msg) => results.push(msg),
+            Err(e) => results.push(format!("CLINE: {}", e)),
+        }
+
+        match Self::install_picli_hook(&home) {
+            Ok(msg) => results.push(msg),
+            Err(e) => results.push(format!("Pi-CLI: {}", e)),
+        }
+
         Ok(results)
     }
 
@@ -301,6 +311,54 @@ impl HookInstaller {
         fs::create_dir_all(&plugin_dir)?;
         fs::write(&plugin_path, HERMES_PLUGIN_JS)?;
         Ok("Hermes: plugin installed".into())
+    }
+
+    fn install_cline_hook(home: &PathBuf) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // CLINE stores its MCP/hook config in ~/.cline/settings.json
+        // It also respects a hooks directory: ~/.cline/hooks/
+        let hook_dir = home.join(".cline/hooks");
+        fs::create_dir_all(&hook_dir)?;
+        let hook_path = hook_dir.join("vibe-island.py");
+        fs::write(&hook_path, CLINE_HOOK_PY)?;
+
+        // Update ~/.cline/settings.json
+        let settings_path = home.join(".cline/settings.json");
+        let mut settings: serde_json::Value = if settings_path.exists() {
+            serde_json::from_str(&fs::read_to_string(&settings_path)?).unwrap_or(serde_json::json!({}))
+        } else {
+            serde_json::json!({})
+        };
+        let obj = settings.as_object_mut().ok_or("not object")?;
+        obj.entry("hookCommand").or_insert(serde_json::json!(
+            format!("python3 {}", hook_path.display())
+        ));
+        obj.entry("hookEvents").or_insert(serde_json::json!(
+            ["PreToolUse", "PostToolUse", "Notification", "Stop"]
+        ));
+        fs::write(&settings_path, serde_json::to_string_pretty(&settings)?)?;
+        Ok("CLINE: hook installed".into())
+    }
+
+    fn install_picli_hook(home: &PathBuf) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // Pi-CLI (pi.ai CLI / Inflection Pi) stores config at ~/.pi/config.json
+        let config_dir = home.join(".pi");
+        fs::create_dir_all(&config_dir)?;
+        let hook_path = config_dir.join("vibe-island-hook.py");
+        fs::write(&hook_path, PICLI_HOOK_PY)?;
+
+        let config_path = config_dir.join("config.json");
+        let mut config: serde_json::Value = if config_path.exists() {
+            serde_json::from_str(&fs::read_to_string(&config_path)?).unwrap_or(serde_json::json!({}))
+        } else {
+            serde_json::json!({})
+        };
+        let obj = config.as_object_mut().ok_or("not object")?;
+        obj.entry("hook").or_insert(serde_json::json!({
+            "command": format!("python3 {}", hook_path.display()),
+            "events": ["session_start", "session_end", "tool_call", "tool_result"]
+        }));
+        fs::write(&config_path, serde_json::to_string_pretty(&config)?)?;
+        Ok("Pi-CLI: hook installed".into())
     }
 
     pub fn uninstall_all() -> Result<Vec<String>, Box<dyn std::error::Error + Send + Sync>> {
@@ -731,4 +789,94 @@ export default (hermes) => {
     hermes.on("tool.result", (ev) => send("PostToolUse", { session_id: sid(), tool_name: ev.tool || "" }));
     hermes.on("idle", () => send("Stop", { session_id: sid() }));
 };
+"#;
+
+const CLINE_HOOK_PY: &str = r#"#!/usr/bin/env python3
+"""vibe-island — CLINE hook (PreToolUse/PostToolUse/Stop)"""
+import os, sys, json, socket, time
+
+_PROTO_REV = "vi-e7c4"
+_COMPAT = 0x3A7F
+SOCKET = os.path.expanduser("~/.vibe-island/run/vibe-island.sock")
+FALLBACK = "/tmp/vibe-island.sock"
+
+def _send(payload: dict):
+    payload.update({"_proto_rev": _PROTO_REV, "_compat": _COMPAT, "_source": "cline"})
+    data = json.dumps(payload).encode()
+    for path in [SOCKET, FALLBACK]:
+        try:
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+                s.settimeout(3)
+                s.connect(path)
+                s.sendall(data)
+                return
+        except Exception:
+            pass
+
+try:
+    event = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+
+hook = event.get("hook_event_name", "")
+sess = event.get("session_id") or f"cline-{os.getpid()}"
+cwd = event.get("cwd") or os.getcwd()
+
+if hook == "PreToolUse":
+    _send({"hook_event_name": "PreToolUse", "session_id": sess, "cwd": cwd,
+           "tool_name": event.get("tool_name",""), "tool_input": event.get("tool_input",{})})
+elif hook == "PostToolUse":
+    _send({"hook_event_name": "PostToolUse", "session_id": sess, "cwd": cwd,
+           "tool_name": event.get("tool_name","")})
+elif hook in ("Stop", "Notification"):
+    _send({"hook_event_name": hook, "session_id": sess, "cwd": cwd,
+           "message": event.get("message","")})
+"#;
+
+const PICLI_HOOK_PY: &str = r#"#!/usr/bin/env python3
+"""vibe-island — Pi-CLI hook (session/tool events)"""
+import os, sys, json, socket
+
+_PROTO_REV = "vi-e7c4"
+_COMPAT = 0x3A7F
+SOCKET = os.path.expanduser("~/.vibe-island/run/vibe-island.sock")
+FALLBACK = "/tmp/vibe-island.sock"
+
+def _send(payload: dict):
+    payload.update({"_proto_rev": _PROTO_REV, "_compat": _COMPAT, "_source": "picli"})
+    data = json.dumps(payload).encode()
+    for path in [SOCKET, FALLBACK]:
+        try:
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+                s.settimeout(3)
+                s.connect(path)
+                s.sendall(data)
+                return
+        except Exception:
+            pass
+
+try:
+    event = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+
+hook = event.get("event", event.get("hook_event_name", ""))
+sess = event.get("session_id") or f"picli-{os.getpid()}"
+cwd = event.get("cwd") or os.getcwd()
+
+MAP = {
+    "session_start": "SessionStart",
+    "session_end": "SessionEnd",
+    "tool_call": "PreToolUse",
+    "tool_result": "PostToolUse",
+    "stop": "Stop",
+    "PreToolUse": "PreToolUse",
+    "PostToolUse": "PostToolUse",
+    "Stop": "Stop",
+}
+
+vi_event = MAP.get(hook)
+if vi_event:
+    _send({"hook_event_name": vi_event, "session_id": sess, "cwd": cwd,
+           "tool_name": event.get("tool_name",""), "tool_input": event.get("tool_input",{})})
 "#;
