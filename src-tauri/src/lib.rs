@@ -117,13 +117,13 @@ async fn uninstall_hooks() -> Result<String, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // Ensure run dir exists
-    let run_dir = dirs::home_dir()
-        .unwrap_or_else(|| PathBuf::from("/tmp"))
-        .join(".vibe-island/run");
+    let vi_base = dirs::home_dir()
+        .or_else(|| dirs::data_local_dir())
+        .unwrap_or_else(|| PathBuf::from("."))
+        .join(".vibe-island");
+    let run_dir = vi_base.join("run");
     std::fs::create_dir_all(&run_dir).ok();
-    let osc2_dir = dirs::home_dir()
-        .unwrap_or_else(|| PathBuf::from("/tmp"))
-        .join(".vibe-island/cache/osc2-titles");
+    let osc2_dir = vi_base.join("cache/osc2-titles");
     std::fs::create_dir_all(&osc2_dir).ok();
 
     let config = AppConfig::load().unwrap_or_default();

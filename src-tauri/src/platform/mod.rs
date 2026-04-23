@@ -83,7 +83,9 @@ pub fn get_info() -> PlatformInfo {
 }
 
 fn read_osc2_title(session_id: &str) -> Option<String> {
-    let dir = dirs::home_dir()?.join(".vibe-island/cache/osc2-titles");
+    let dir = dirs::home_dir()
+        .or_else(dirs::data_local_dir)?
+        .join(".vibe-island/cache/osc2-titles");
     let prefix = &session_id[..session_id.len().min(16)];
     std::fs::read_to_string(dir.join(prefix)).ok()
 }

@@ -17,7 +17,8 @@ impl SocketServer {
 
     pub fn socket_path() -> PathBuf {
         let run_dir = dirs::home_dir()
-            .unwrap_or_else(|| PathBuf::from("/tmp"))
+            .or_else(|| dirs::data_local_dir())
+            .unwrap_or_else(|| PathBuf::from("."))
             .join(".vibe-island/run");
         std::fs::create_dir_all(&run_dir).ok();
         run_dir.join("vibe-island.sock")
