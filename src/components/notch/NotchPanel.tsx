@@ -5,12 +5,15 @@ import { SessionRow } from "./SessionRow";
 import { ApprovalCard } from "../approval/ApprovalCard";
 import { PixelPetLarge } from "./PixelPet";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { invoke } from "@tauri-apps/api/core";
 
 export function NotchPanel() {
-  const { sessions, expanded, toggleExpanded, setExpanded, platform, config } = useStore();
+  const { sessions, expanded, toggleExpanded, setExpanded, platform, config, updateConfig } = useStore();
   const [hovering, setHovering] = useState(false);
+  const [pillCtxMenu, setPillCtxMenu] = useState<{ x: number; y: number } | null>(null);
   const dwellTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prevPrimaryStatus = useRef<string>("");
+  const soundMuted = config?.sound?.enabled === false;
 
   const activeSessions = sessions.filter((s) => s.status !== "completed");
   const waitingSessions = sessions.filter(
@@ -94,9 +97,59 @@ export function NotchPanel() {
         <div
           className="compact-pill"
           data-tauri-drag-region
-          onClick={() => !isExpanded && toggleExpanded()}
+          onClick={() => { setPillCtxMenu(null); !isExpanded && toggleExpanded(); }}
+          onContextMenu={(e) => { e.preventDefault(); setPillCtxMenu({ x: e.clientX, y: e.clientY }); }}
           style={{ cursor: isExpanded ? "grab" : "pointer" }}
         >
+          {pillCtxMenu && (
+            <div
+              style={{
+                position: "fixed",
+                left: pillCtxMenu.x,
+                top: pillCtxMenu.y,
+                background: "rgba(20,20,25,0.97)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: 8,
+                padding: "4px 0",
+                zIndex: 9999,
+                minWidth: 160,
+                boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+              }}
+              onClick={e => e.stopPropagation()}
+              onMouseLeave={() => setPillCtxMenu(null)}
+            >
+              {[
+                { label: "Settings", action: () => { openSettings(); setPillCtxMenu(null); } },
+                { label: soundMuted ? "Unmute Sounds" : "Mute Sounds", action: () => {
+                  if (config) updateConfig({ ...config, sound: { ...config.sound, enabled: !config.sound.enabled } });
+                  setPillCtxMenu(null);
+                }},
+                { label: "Check for Updates", action: async () => { setPillCtxMenu(null); await invoke("check_for_update"); } },
+                { label: "Quit", action: async () => { setPillCtxMenu(null); await invoke("plugin:process|exit", { code: 0 }); } },
+              ].map(item => (
+                <button
+                  key={item.label}
+                  data-no-drag
+                  onClick={item.action}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    padding: "7px 14px",
+                    background: "none",
+                    border: "none",
+                    color: "rgba(255,255,255,0.85)",
+                    fontSize: 11,
+                    textAlign: "left",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.06)")}
+                  onMouseLeave={e => (e.currentTarget.style.background = "none")}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
           <PixelPetLarge status={primaryStatus as any} />
           <span className="idle-text">{primaryTitle}</span>
 

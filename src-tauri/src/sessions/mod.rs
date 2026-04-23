@@ -244,6 +244,14 @@ impl SessionStore {
                 false
             }
 
+            "Notification" => {
+                // Update last_activity so the session stays alive; no status change
+                if let Some(s) = sessions.get_mut(&event.session_id) {
+                    s.last_activity = Utc::now();
+                }
+                false
+            }
+
             _ => false,
         }
     }
