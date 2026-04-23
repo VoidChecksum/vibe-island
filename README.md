@@ -233,7 +233,7 @@ windowrulev2 = move 33% 0, class:^(vibe-island)$
 Install hooks for all your AI tools in one command:
 
 ```bash
-npx vibe-island install
+npx @voidchecksum/vibe-island install
 ```
 
 Then [download the app](#download) for your platform.

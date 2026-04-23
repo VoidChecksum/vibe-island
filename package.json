@@ -1,10 +1,10 @@
 {
-  "name": "vibe-island",
+  "name": "@voidchecksum/vibe-island",
   "version": "1.0.0",
   "description": "Dynamic Island for your AI coding tools — monitor Claude Code, Codex, Gemini, Cursor and more from a floating notch panel",
   "type": "module",
   "bin": {
-    "vibe-island": "./bin/vibe-island.js"
+    "vibe-island": "bin/vibe-island.js"
   },
   "files": [
     "bin/vibe-island.js",
@@ -37,7 +37,7 @@
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/VoidChecksum/vibe-island.git"
+    "url": "git+https://github.com/VoidChecksum/vibe-island.git"
   },
   "homepage": "https://github.com/VoidChecksum/vibe-island#readme",
   "bugs": {
