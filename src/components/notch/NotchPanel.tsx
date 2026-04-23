@@ -8,12 +8,28 @@ import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { invoke } from "@tauri-apps/api/core";
 
 export function NotchPanel() {
-  const { sessions, expanded, toggleExpanded, setExpanded, platform, config, updateConfig } = useStore();
+  const { sessions, expanded, toggleExpanded, setExpanded, platform, config, updateConfig, selectSession, selectedSessionId } = useStore();
   const [hovering, setHovering] = useState(false);
   const [pillCtxMenu, setPillCtxMenu] = useState<{ x: number; y: number } | null>(null);
   const dwellTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prevPrimaryStatus = useRef<string>("");
   const soundMuted = config?.sound?.enabled === false;
+
+  // ⌥G heartbeat: expand notch and cycle to next session
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.altKey && e.key === "g") {
+        setExpanded(true);
+        const active = sessions.filter(s => s.status !== "completed");
+        if (active.length === 0) return;
+        const idx = active.findIndex(s => s.id === selectedSessionId);
+        const next = active[(idx + 1) % active.length];
+        selectSession(next.id);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sessions, selectedSessionId, setExpanded, selectSession]);
 
   const activeSessions = sessions.filter((s) => s.status !== "completed");
   const waitingSessions = sessions.filter(

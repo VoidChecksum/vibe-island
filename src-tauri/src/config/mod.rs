@@ -145,7 +145,11 @@ impl AppConfig {
 
     pub fn save(&self) -> Result<(), Box<dyn std::error::Error>> {
         let path = Self::config_path();
-        fs::write(&path, serde_json::to_string_pretty(self)?)?;
+        let content = serde_json::to_string_pretty(self)?;
+        // Symlink-safe: write to temp then rename (atomic, preserves symlinks on most FSes)
+        let tmp = path.with_extension("json.tmp");
+        fs::write(&tmp, &content)?;
+        fs::rename(&tmp, &path)?;
         Ok(())
     }
 }
