@@ -257,6 +257,14 @@ end tell"#, tty = tty_name);
                 return;
             }
 
+            // WezTerm: activate specific pane via CLI
+            if let Ok(pane_id) = std::env::var("WEZTERM_PANE") {
+                let out = std::process::Command::new("wezterm")
+                    .args(["cli", "activate-pane", "--pane-id", &pane_id])
+                    .output();
+                if out.map(|o| o.status.success()).unwrap_or(false) { return; }
+            }
+
             // Warp: generic activate by bundle id
             let script = r#"tell application id "dev.warp.Warp-Stable" to activate"#;
             let _ = std::process::Command::new("osascript").args(["-e", script]).output();
@@ -270,6 +278,14 @@ end tell"#, tty = tty_name);
             if let Some(ref tty_path) = tty {
                 if focus_tmux_by_tty(tty_path) { return; }
             }
+        }
+
+        // 1b. WezTerm: use wezterm CLI if WEZTERM_PANE is set
+        if let Ok(pane_id) = std::env::var("WEZTERM_PANE") {
+            let out = std::process::Command::new("wezterm")
+                .args(["cli", "activate-pane", "--pane-id", &pane_id])
+                .output();
+            if out.map(|o| o.status.success()).unwrap_or(false) { return; }
         }
 
         // 2. Resolve terminal emulator PID from TTY (works for all terminals)

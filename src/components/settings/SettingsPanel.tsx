@@ -83,6 +83,19 @@ export function SettingsPanel() {
                 onChange={(e) => setLayout("dwell_time_secs", parseFloat(e.target.value))}
                 className="w-full" style={{ accentColor: "var(--vi-work)" }} data-no-drag />
             </div>
+            <div className="py-2.5">
+              <div className="flex justify-between items-center mb-1.5">
+                <p className="text-sm font-medium">Session dismissal timeout</p>
+                <span className="text-xs" style={{ color: "var(--notch-muted)" }}>
+                  {localConfig.layout.session_idle_cleanup_secs === 0 ? "Off" : `${Math.round(localConfig.layout.session_idle_cleanup_secs / 60)}m`}
+                </span>
+              </div>
+              <p className="text-xs mb-2" style={{ color: "var(--notch-muted)" }}>Auto-remove idle sessions after this period (0 = never)</p>
+              <input type="range" min="0" max="1800" step="60"
+                value={localConfig.layout.session_idle_cleanup_secs}
+                onChange={(e) => setLayout("session_idle_cleanup_secs", parseInt(e.target.value))}
+                className="w-full" style={{ accentColor: "var(--vi-work)" }} data-no-drag />
+            </div>
           </div>
         </section>
 

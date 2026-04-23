@@ -288,4 +288,25 @@ impl SessionStore {
         }
         Ok(())
     }
+
+    /// Remove sessions idle for longer than `timeout_secs`. Returns count removed.
+    pub async fn cleanup_idle(&self, timeout_secs: u64) -> usize {
+        let cutoff = Utc::now() - chrono::Duration::seconds(timeout_secs as i64);
+        let mut sessions = self.sessions.lock().await;
+        let before = sessions.len();
+        sessions.retain(|_, s| {
+            // Keep if waiting for approval/answer (don't abandon pending requests)
+            if s.status == SessionStatus::WaitingForApproval
+                || s.status == SessionStatus::WaitingForAnswer
+            {
+                return true;
+            }
+            // Keep if active/in-progress (had recent activity)
+            if s.last_activity > cutoff {
+                return true;
+            }
+            false
+        });
+        before - sessions.len()
+    }
 }

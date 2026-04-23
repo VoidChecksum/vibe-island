@@ -65,6 +65,7 @@ export interface AppConfig {
     click_outside_dismisses: boolean;
     notch_follows_active_window: boolean;
     auto_configure_terminal_titles: boolean;
+    session_idle_cleanup_secs: number;
   };
   shortcuts: {
     toggle_panel: string;

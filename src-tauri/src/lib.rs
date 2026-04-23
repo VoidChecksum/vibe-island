@@ -14,7 +14,7 @@ use config::AppConfig;
 
 use std::path::PathBuf;
 use std::sync::Arc;
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 use tokio::sync::RwLock;
 
 pub type SharedState = Arc<RwLock<AppState>>;
@@ -114,6 +114,35 @@ async fn uninstall_hooks() -> Result<String, String> {
     Ok(results.join("\n"))
 }
 
+/// Toggle Claude Code bypass/auto-approve mode for a session.
+/// Writes CLAUDE_BYPASS_PERMISSIONS=1 env-flag into a well-known file
+/// that the hook reads on next invocation.
+#[tauri::command]
+async fn set_bypass_mode(session_id: String, enabled: bool) -> Result<(), String> {
+    let flag_dir = dirs::home_dir()
+        .or_else(|| dirs::data_local_dir())
+        .unwrap_or_else(|| PathBuf::from("."))
+        .join(".vibe-island/bypass-flags");
+    std::fs::create_dir_all(&flag_dir).map_err(|e| e.to_string())?;
+    let flag_file = flag_dir.join(&session_id);
+    if enabled {
+        std::fs::write(&flag_file, "1").map_err(|e| e.to_string())?;
+    } else {
+        let _ = std::fs::remove_file(&flag_file);
+    }
+    Ok(())
+}
+
+#[tauri::command]
+async fn cleanup_sessions(state: tauri::State<'_, SharedState>) -> Result<usize, String> {
+    let timeout = {
+        let s = state.read().await;
+        s.config.layout.session_idle_cleanup_secs
+    };
+    let s = state.read().await;
+    Ok(s.sessions.cleanup_idle(timeout).await)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // Ensure run dir exists
@@ -157,6 +186,8 @@ pub fn run() {
             get_platform_info,
             jump_to_terminal,
             uninstall_hooks,
+            set_bypass_mode,
+            cleanup_sessions,
             updater::check_for_update,
             updater::install_update,
         ])
@@ -189,6 +220,27 @@ pub fn run() {
 
             // Background update check (emits "update-available" to frontend)
             tauri::async_runtime::spawn(updater::check_on_startup(app.handle().clone()));
+
+            // Session idle cleanup loop
+            let cleanup_state = app.state::<SharedState>().inner().clone();
+            let cleanup_handle = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                loop {
+                    tokio::time::sleep(std::time::Duration::from_secs(60)).await;
+                    let timeout = {
+                        let s = cleanup_state.read().await;
+                        s.config.layout.session_idle_cleanup_secs
+                    };
+                    if timeout > 0 {
+                        let s = cleanup_state.read().await;
+                        let removed = s.sessions.cleanup_idle(timeout).await;
+                        if removed > 0 {
+                            drop(s);
+                            let _ = cleanup_handle.emit("session-update", "cleanup");
+                        }
+                    }
+                }
+            });
 
             Ok(())
         })

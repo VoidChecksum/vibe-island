@@ -35,6 +35,7 @@ pub struct LayoutConfig {
     pub click_outside_dismisses: bool,
     pub notch_follows_active_window: bool,
     pub auto_configure_terminal_titles: bool,
+    pub session_idle_cleanup_secs: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -86,6 +87,7 @@ impl Default for AppConfig {
                 click_outside_dismisses: false,
                 notch_follows_active_window: false,
                 auto_configure_terminal_titles: false,
+                session_idle_cleanup_secs: 300, // 5 minutes default
             },
             shortcuts: ShortcutConfig {
                 toggle_panel: "CmdOrCtrl+Shift+V".into(),

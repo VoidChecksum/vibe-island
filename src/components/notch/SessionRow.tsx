@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { PixelPet } from "./PixelPet";
 import type { Session } from "../../types";
 import { TOOL_LABELS } from "../../types";
@@ -44,7 +45,8 @@ function terminalName(session: Session): string | null {
 }
 
 export function SessionRow({ session, isHero = false }: Props) {
-  const { jumpToTerminal } = useStore();
+  const { jumpToTerminal, toggleBypass, bypassSessions } = useStore();
+  const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number } | null>(null);
   const toolLabel = TOOL_LABELS[session.source] || session.source;
   const projectName = session.cwd?.split("/").pop() || session.cwd?.split("\\").pop() || "";
   const displayTitle = session.title
@@ -56,6 +58,7 @@ export function SessionRow({ session, isHero = false }: Props) {
   const isDone = session.status === "completed" || session.status === "idle";
 
   const isBypass =
+    bypassSessions.has(session.id) ||
     session.env?.CLAUDE_BYPASS_PERMISSIONS === "1" ||
     session.codex_permission_mode === "full-auto" ||
     session.env?.BYPASS_PERMISSIONS === "1";
@@ -76,12 +79,64 @@ export function SessionRow({ session, isHero = false }: Props) {
     return "var(--vi-work)";
   })();
 
+  const handleCtxMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCtxMenu({ x: e.clientX, y: e.clientY });
+  };
+
   return (
     <div
       className={`sess-card${!isHero ? " sess-mini" : ""}${isDone && isHero ? " sess-done" : ""}`}
-      onClick={() => jumpToTerminal(session.id)}
+      onClick={() => { setCtxMenu(null); jumpToTerminal(session.id); }}
+      onContextMenu={handleCtxMenu}
       title={`Click to jump to ${toolLabel} terminal`}
     >
+      {ctxMenu && (
+        <div
+          style={{
+            position: "fixed",
+            left: ctxMenu.x,
+            top: ctxMenu.y,
+            background: "rgba(20,20,25,0.97)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 8,
+            padding: "4px 0",
+            zIndex: 9999,
+            minWidth: 160,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+          }}
+          onClick={e => e.stopPropagation()}
+          onMouseLeave={() => setCtxMenu(null)}
+        >
+          {[
+            { label: "Jump to Terminal", action: () => { jumpToTerminal(session.id); setCtxMenu(null); } },
+            { label: isBypass ? "Disable Auto Mode" : "Enable Auto Mode", action: () => { toggleBypass(session.id); setCtxMenu(null); } },
+          ].map(item => (
+            <button
+              key={item.label}
+              data-no-drag
+              onClick={item.action}
+              style={{
+                display: "block",
+                width: "100%",
+                padding: "7px 14px",
+                background: "none",
+                border: "none",
+                color: "rgba(255,255,255,0.85)",
+                fontSize: 11,
+                textAlign: "left",
+                cursor: "pointer",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.06)")}
+              onMouseLeave={e => (e.currentTarget.style.background = "none")}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="sess-pet" style={{ display: "flex", alignItems: isHero ? "flex-start" : "center" }}>
         {isHero
           ? <PixelPet status={session.status} size={16} />

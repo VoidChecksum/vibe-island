@@ -90,7 +90,112 @@ impl HookInstaller {
             Err(e) => results.push(format!("Pi-CLI: {}", e)),
         }
 
+        match Self::install_copilot_hook(&home) {
+            Ok(msg) => results.push(msg),
+            Err(e) => results.push(format!("Copilot: {}", e)),
+        }
+
+        match Self::install_windsurf_hook(&home) {
+            Ok(msg) => results.push(msg),
+            Err(e) => results.push(format!("Windsurf: {}", e)),
+        }
+
+        match Self::install_codebuddy_hook(&home) {
+            Ok(msg) => results.push(msg),
+            Err(e) => results.push(format!("CodeBuddy: {}", e)),
+        }
+
+        match Self::install_qoder_hook(&home) {
+            Ok(msg) => results.push(msg),
+            Err(e) => results.push(format!("Qoder: {}", e)),
+        }
+
         Ok(results)
+    }
+
+    fn install_copilot_hook(home: &PathBuf) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // GitHub Copilot CLI stores config at ~/.config/gh-copilot/ or ~/.copilot/
+        // It supports a hooks.json for lifecycle events
+        let dirs_to_try = [
+            home.join(".config/gh-copilot"),
+            home.join(".copilot"),
+        ];
+        let config_dir = dirs_to_try.iter().find(|d| d.exists()).cloned()
+            .unwrap_or_else(|| dirs_to_try[0].clone());
+        fs::create_dir_all(&config_dir)?;
+        let hook_path = config_dir.join("vibe-island-hook.py");
+        fs::write(&hook_path, CLAUDE_HOOK_PY)?;
+        let hooks_path = config_dir.join("hooks.json");
+        let mut hooks: serde_json::Value = if hooks_path.exists() {
+            serde_json::from_str(&fs::read_to_string(&hooks_path)?).unwrap_or(serde_json::json!({}))
+        } else { serde_json::json!({}) };
+        let obj = hooks.as_object_mut().ok_or("not an object")?;
+        for event in &["PreToolUse", "PostToolUse", "SessionStart", "Stop", "Notification"] {
+            obj.entry(*event).or_insert(serde_json::json!([{
+                "type": "command",
+                "command": format!("python3 {}", hook_path.display()),
+                "timeout": 300000
+            }]));
+        }
+        fs::write(&hooks_path, serde_json::to_string_pretty(&hooks)?)?;
+        Ok("Copilot: hooks installed".into())
+    }
+
+    fn install_windsurf_hook(home: &PathBuf) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // Windsurf stores settings at ~/.windsurf/ and follows a similar pattern to VS Code
+        let config_dir = home.join(".windsurf");
+        if !config_dir.exists() {
+            return Ok("Windsurf: not installed, skipped".into());
+        }
+        let hook_path = config_dir.join("vibe-island-hook.py");
+        fs::write(&hook_path, CLAUDE_HOOK_PY)?;
+        let settings_path = config_dir.join("settings.json");
+        let mut settings: serde_json::Value = if settings_path.exists() {
+            serde_json::from_str(&fs::read_to_string(&settings_path)?).unwrap_or(serde_json::json!({}))
+        } else { serde_json::json!({}) };
+        let obj = settings.as_object_mut().ok_or("not an object")?;
+        obj.entry("vibe_island_hook").or_insert(serde_json::json!({
+            "command": format!("python3 {}", hook_path.display()),
+            "events": ["SessionStart", "SessionEnd", "PreToolUse", "PostToolUse"]
+        }));
+        fs::write(&settings_path, serde_json::to_string_pretty(&settings)?)?;
+        Ok("Windsurf: hooks installed".into())
+    }
+
+    fn install_codebuddy_hook(home: &PathBuf) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // CodeBuddy stores config at ~/.codebuddy/
+        let config_dir = home.join(".codebuddy");
+        if !config_dir.exists() {
+            return Ok("CodeBuddy: not installed, skipped".into());
+        }
+        let hook_path = config_dir.join("vibe-island-hook.py");
+        fs::write(&hook_path, CLAUDE_HOOK_PY)?;
+        let config_path = config_dir.join("config.json");
+        let mut config: serde_json::Value = if config_path.exists() {
+            serde_json::from_str(&fs::read_to_string(&config_path)?).unwrap_or(serde_json::json!({}))
+        } else { serde_json::json!({}) };
+        let obj = config.as_object_mut().ok_or("not an object")?;
+        obj.entry("vibe_island_hook").or_insert(serde_json::json!(format!("python3 {}", hook_path.display())));
+        fs::write(&config_path, serde_json::to_string_pretty(&config)?)?;
+        Ok("CodeBuddy: hooks installed".into())
+    }
+
+    fn install_qoder_hook(home: &PathBuf) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // Qoder stores config at ~/.qoder/
+        let config_dir = home.join(".qoder");
+        if !config_dir.exists() {
+            return Ok("Qoder: not installed, skipped".into());
+        }
+        let hook_path = config_dir.join("vibe-island-hook.py");
+        fs::write(&hook_path, CLAUDE_HOOK_PY)?;
+        let config_path = config_dir.join("config.json");
+        let mut config: serde_json::Value = if config_path.exists() {
+            serde_json::from_str(&fs::read_to_string(&config_path)?).unwrap_or(serde_json::json!({}))
+        } else { serde_json::json!({}) };
+        let obj = config.as_object_mut().ok_or("not an object")?;
+        obj.entry("vibe_island_hook").or_insert(serde_json::json!(format!("python3 {}", hook_path.display())));
+        fs::write(&config_path, serde_json::to_string_pretty(&config)?)?;
+        Ok("Qoder: hooks installed".into())
     }
 
     fn install_claude_hook(home: &PathBuf) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {

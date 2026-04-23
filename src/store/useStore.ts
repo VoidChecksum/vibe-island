@@ -9,6 +9,8 @@ interface AppStore {
   selectedSessionId: string | null;
   config: AppConfig | null;
   platform: PlatformInfo | null;
+  mutedSessions: Set<string>;
+  bypassSessions: Set<string>;
 
   setExpanded: (expanded: boolean) => void;
   toggleExpanded: () => void;
@@ -21,6 +23,7 @@ interface AppStore {
   loadConfig: () => Promise<void>;
   updateConfig: (config: AppConfig) => Promise<void>;
   loadPlatform: () => Promise<void>;
+  toggleBypass: (sessionId: string) => Promise<void>;
   init: () => Promise<void>;
 }
 
@@ -30,6 +33,8 @@ export const useStore = create<AppStore>((set, get) => ({
   selectedSessionId: null,
   config: null,
   platform: null,
+  mutedSessions: new Set(),
+  bypassSessions: new Set(),
 
   setExpanded: (expanded) => set({ expanded }),
   toggleExpanded: () => set((s) => ({ expanded: !s.expanded })),
@@ -102,6 +107,19 @@ export const useStore = create<AppStore>((set, get) => ({
       set({ platform });
     } catch (e) {
       console.error("Failed to load platform:", e);
+    }
+  },
+
+  toggleBypass: async (sessionId) => {
+    const { bypassSessions } = get();
+    const next = new Set(bypassSessions);
+    const enabled = !next.has(sessionId);
+    if (enabled) next.add(sessionId); else next.delete(sessionId);
+    set({ bypassSessions: next });
+    try {
+      await invoke("set_bypass_mode", { sessionId, enabled });
+    } catch (e) {
+      console.error("Failed to set bypass mode:", e);
     }
   },
 
