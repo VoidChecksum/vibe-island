@@ -1,6 +1,6 @@
 import { PixelPet } from "./PixelPet";
 import type { Session } from "../../types";
-import { TOOL_LABELS, TOOL_COLORS } from "../../types";
+import { TOOL_LABELS } from "../../types";
 import { useStore } from "../../store/useStore";
 
 interface Props {
@@ -46,7 +46,6 @@ function terminalName(session: Session): string | null {
 export function SessionRow({ session, isHero = false }: Props) {
   const { jumpToTerminal } = useStore();
   const toolLabel = TOOL_LABELS[session.source] || session.source;
-  const toolColor = TOOL_COLORS[session.source] || "#888";
   const projectName = session.cwd?.split("/").pop() || session.cwd?.split("\\").pop() || "";
   const displayTitle = session.title
     || session.codex_title
@@ -84,7 +83,7 @@ export function SessionRow({ session, isHero = false }: Props) {
       <div className="sess-info">
         <div className="sess-r1">
           <span className="sess-name">{displayTitle}</span>
-          <span className="sess-tag" style={{ color: toolColor }}>{toolLabel}</span>
+          <span className="sess-tag">{toolLabel}</span>
           {termName && <span className="sess-tag">{termName}</span>}
           {isBypass && (
             <span
@@ -108,7 +107,7 @@ export function SessionRow({ session, isHero = false }: Props) {
         )}
 
         {isHero && !isDone && session.tool_name && (
-          <div className="sess-you" style={{ color: "var(--vi-explore)" }}>
+          <div className="sess-you" style={{ color: "var(--vi-work)" }}>
             {session.tool_name}
             {session.tool_input && typeof session.tool_input === "object" &&
              (session.tool_input as Record<string, unknown>).file_path
