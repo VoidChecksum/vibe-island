@@ -153,8 +153,15 @@ button, input, select, a, [data-no-drag] {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex-shrink: 1;
+  flex: 1;
   min-width: 0;
+}
+
+/* Mini session name is dimmer and lighter weight (matches .v6-sess-mini .v6-sn) */
+.sess-card.sess-mini .sess-name {
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .sess-card .sess-tag {
@@ -217,12 +224,27 @@ button, input, select, a, [data-no-drag] {
 }
 .approve-btn.allow:hover { background: rgba(255, 255, 255, 1); }
 
-/* ── Pulse dot animation ── */
+/* ── Pixel Pet glow (matches live site: drop-shadow on pet SVG) ── */
+.pixel-pet svg {
+  filter: drop-shadow(0 0 3px var(--vi-idle));
+}
+.sess-pet-svg {
+  filter: drop-shadow(0 0 2px currentColor);
+}
+
+/* ── Pulse animations ── */
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
 .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+/* Approval dot pulse (matches v6pulse from live CSS) */
+@keyframes v6pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.3); }
+}
+.appr-dot-pulse { animation: v6pulse 1.5s infinite; }
 
 /* ── Source colors ── */
 .source-claude { color: #f97316; }

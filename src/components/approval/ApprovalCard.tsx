@@ -101,12 +101,12 @@ export function ApprovalCard({ session }: Props) {
           padding: "10px 12px",
         }}
       >
-        {/* Header: chat bubble + "Claude asks" */}
+        {/* Header: chat bubble + "Claude asks" — var(--vi-question) per live CSS */}
         <div className="flex items-center mb-1.5" style={{ gap: 5 }}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--vi-explore)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--vi-question)">
             <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
           </svg>
-          <span style={{ color: "var(--vi-explore)", fontSize: 10, fontWeight: 600 }}>
+          <span style={{ color: "var(--vi-question)", fontSize: 10, fontWeight: 600 }}>
             {session.source === "claude" ? "Claude" : session.source} asks
           </span>
         </div>
@@ -231,9 +231,9 @@ export function ApprovalCard({ session }: Props) {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          {/* Header: orange dot + "Permission Request" */}
+          {/* Header: orange dot (pulsing) + "Permission Request" */}
           <div className="flex items-center" style={{ gap: 6, marginBottom: 2 }}>
-            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--vi-alert)", flexShrink: 0 }} />
+            <div className="appr-dot-pulse" style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--vi-alert)", flexShrink: 0 }} />
             <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>Permission Request</span>
           </div>
 
@@ -257,6 +257,7 @@ export function ApprovalCard({ session }: Props) {
                 padding: "3px 0",
                 fontSize: 9,
                 fontFamily: "var(--font-mono)",
+                maxHeight: 68,
                 overflow: "hidden",
               }}>
                 {diffLines.map((line, i) => (

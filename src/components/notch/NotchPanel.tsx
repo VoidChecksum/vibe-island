@@ -79,7 +79,17 @@ export function NotchPanel() {
         className="notch-shell"
         animate={{ width: isExpanded ? 380 : 240 }}
         transition={{ type: "spring", stiffness: 500, damping: 35 }}
-        style={{ maxWidth: 400 }}
+        style={{
+          maxWidth: 400,
+          boxShadow: sessions.some(s => s.status === "waiting_for_approval")
+            ? "0 2px 8px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.3), 0 0 20px rgba(249,115,22,0.15)"
+            : sessions.some(s => s.status === "waiting_for_answer")
+            ? "0 2px 8px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.3), 0 0 20px rgba(6,182,212,0.15)"
+            : isExpanded
+            ? "0 2px 8px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.3), 0 0 15px rgba(255,255,255,0.04)"
+            : "0 2px 8px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.3)",
+          transition: "box-shadow 0.4s ease-out",
+        }}
       >
         <div
           className="compact-pill"
