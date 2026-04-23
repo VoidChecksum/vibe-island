@@ -3,11 +3,7 @@ use crate::SharedState;
 
 use std::path::PathBuf;
 use tauri::{AppHandle, Emitter};
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::sync::oneshot;
-
-#[cfg(unix)]
-use tokio::net::UnixListener;
 
 pub struct SocketServer {
     state: SharedState,
@@ -19,7 +15,7 @@ impl SocketServer {
         Self { state, handle }
     }
 
-    fn socket_path() -> PathBuf {
+    pub fn socket_path() -> PathBuf {
         let run_dir = dirs::home_dir()
             .unwrap_or_else(|| PathBuf::from("/tmp"))
             .join(".vibe-island/run");
@@ -28,155 +24,208 @@ impl SocketServer {
     }
 
     pub async fn start(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        #[cfg(unix)]
+        {
+            self.start_unix().await
+        }
+        #[cfg(windows)]
+        {
+            self.start_windows().await
+        }
+        #[cfg(not(any(unix, windows)))]
+        {
+            tracing::warn!("IPC socket not supported on this platform");
+            Ok(())
+        }
+    }
+
+    // ── Unix (macOS + Linux) ──────────────────────────────────────────────────
+
+    #[cfg(unix)]
+    async fn start_unix(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        use tokio::net::UnixListener;
+
         let path = Self::socket_path();
-
-        // Remove stale socket
         let _ = std::fs::remove_file(&path);
-
         let listener = UnixListener::bind(&path)?;
         tracing::info!("Socket server listening on {}", path.display());
 
         loop {
             match listener.accept().await {
-                Ok((stream, _addr)) => {
+                Ok((stream, _)) => {
                     let state = self.state.clone();
                     let handle = self.handle.clone();
                     tokio::spawn(async move {
-                        if let Err(e) = Self::handle_connection(stream, state, handle).await {
+                        if let Err(e) = Self::handle_unix(stream, state, handle).await {
                             tracing::error!("Connection error: {}", e);
                         }
                     });
                 }
-                Err(e) => {
-                    tracing::error!("Accept error: {}", e);
-                }
+                Err(e) => tracing::error!("Accept error: {}", e),
             }
         }
     }
 
-    async fn handle_connection(
+    #[cfg(unix)]
+    async fn handle_unix(
         stream: tokio::net::UnixStream,
         state: SharedState,
         handle: AppHandle,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        use tokio::io::{AsyncReadExt, AsyncWriteExt};
+
         let (mut reader, mut writer) = stream.into_split();
         let mut data = Vec::new();
         let mut buf = [0u8; 4096];
 
-        // Read all data from the client
         loop {
             match reader.read(&mut buf).await {
                 Ok(0) => break,
                 Ok(n) => data.extend_from_slice(&buf[..n]),
-                Err(e) => {
-                    tracing::warn!("Read error: {}", e);
-                    break;
-                }
+                Err(e) => { tracing::warn!("Read error: {}", e); break; }
             }
-            // If we have a complete JSON object, stop reading
-            if serde_json::from_slice::<serde_json::Value>(&data).is_ok() {
-                break;
-            }
+            if serde_json::from_slice::<serde_json::Value>(&data).is_ok() { break; }
         }
 
-        if data.is_empty() {
-            return Ok(());
-        }
+        if data.is_empty() { return Ok(()); }
 
         let event: HookEvent = match serde_json::from_slice(&data) {
             Ok(e) => e,
-            Err(e) => {
-                tracing::warn!("Invalid event JSON: {}", e);
-                return Ok(());
-            }
+            Err(e) => { tracing::warn!("Invalid event JSON: {}", e); return Ok(()); }
         };
 
+        let response = Self::process_event(event, state, &handle).await?;
+        if let Some(bytes) = response {
+            let _ = writer.write_all(&bytes).await;
+        }
+        Ok(())
+    }
+
+    // ── Windows (named pipe) ──────────────────────────────────────────────────
+
+    #[cfg(windows)]
+    async fn start_windows(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        use tokio::net::windows::named_pipe::{PipeMode, ServerOptions};
+        use tokio::io::{AsyncReadExt, AsyncWriteExt};
+
+        let pipe_name = r"\\.\pipe\vibe-island";
+        tracing::info!("Named pipe server listening on {}", pipe_name);
+
+        loop {
+            let server = ServerOptions::new()
+                .pipe_mode(PipeMode::Byte)
+                .in_buffer_size(65536)
+                .out_buffer_size(65536)
+                .create(pipe_name)?;
+
+            server.connect().await?;
+
+            let state = self.state.clone();
+            let handle = self.handle.clone();
+            tokio::spawn(async move {
+                let mut data = Vec::new();
+                let mut buf = [0u8; 4096];
+                let (mut reader, mut writer) = tokio::io::split(server);
+
+                loop {
+                    match reader.read(&mut buf).await {
+                        Ok(0) => break,
+                        Ok(n) => data.extend_from_slice(&buf[..n]),
+                        Err(e) => { tracing::warn!("Pipe read error: {}", e); break; }
+                    }
+                    if serde_json::from_slice::<serde_json::Value>(&data).is_ok() { break; }
+                }
+
+                if data.is_empty() { return; }
+
+                let event: HookEvent = match serde_json::from_slice(&data) {
+                    Ok(e) => e,
+                    Err(e) => { tracing::warn!("Invalid pipe JSON: {}", e); return; }
+                };
+
+                if let Ok(Some(bytes)) = Self::process_event(event, state, &handle).await {
+                    let _ = writer.write_all(&bytes).await;
+                }
+            });
+        }
+    }
+
+    // ── Shared event processing ───────────────────────────────────────────────
+
+    async fn process_event(
+        event: HookEvent,
+        state: SharedState,
+        handle: &AppHandle,
+    ) -> Result<Option<Vec<u8>>, Box<dyn std::error::Error + Send + Sync>> {
         let session_id = event.session_id.clone();
         let is_question = event.tool_name.as_deref() == Some("AskUserQuestion");
 
-        // Process the event
         let s = state.read().await;
         let needs_held = s.sessions.handle_event(&event).await;
         drop(s);
 
-        // Emit update to frontend
         let _ = handle.emit("session-update", &session_id);
 
-        // If permission/question request, set up held connection
-        if needs_held {
-            if is_question {
-                let (tx, rx) = oneshot::channel::<serde_json::Value>();
-                let pending = PendingQuestion {
-                    request_id: event.request_id.unwrap_or_default(),
-                    questions: event
-                        .tool_input
-                        .and_then(|v| v.get("questions").cloned())
-                        .and_then(|v| serde_json::from_value(v).ok())
-                        .unwrap_or_default(),
-                    server_port: event.server_port.unwrap_or(4096),
-                    responder: tx,
-                };
+        if !needs_held {
+            return Ok(None);
+        }
 
-                let s = state.read().await;
-                s.sessions.set_pending_question(session_id.clone(), pending).await;
-                drop(s);
+        if is_question {
+            let (tx, rx) = oneshot::channel::<serde_json::Value>();
+            let pending = PendingQuestion {
+                request_id: event.request_id.unwrap_or_default(),
+                questions: event
+                    .tool_input
+                    .as_ref()
+                    .and_then(|v| v.get("questions").cloned())
+                    .and_then(|v| serde_json::from_value(v).ok())
+                    .unwrap_or_default(),
+                server_port: event.server_port.unwrap_or(4096),
+                responder: tx,
+            };
 
-                let _ = handle.emit("question-asked", &session_id);
+            let s = state.read().await;
+            s.sessions.set_pending_question(session_id.clone(), pending).await;
+            drop(s);
 
-                // Wait for response (held connection, 5 min timeout)
-                match tokio::time::timeout(
-                    std::time::Duration::from_secs(300),
-                    rx,
-                ).await {
-                    Ok(Ok(answers)) => {
-                        let response = serde_json::json!({
-                            "hookSpecificOutput": {
-                                "decision": {
-                                    "updatedInput": { "answers": answers }
-                                }
-                            }
-                        });
-                        let _ = writer.write_all(serde_json::to_string(&response)?.as_bytes()).await;
-                    }
-                    _ => {} // Timeout or cancelled
+            let _ = handle.emit("question-asked", &session_id);
+
+            match tokio::time::timeout(std::time::Duration::from_secs(300), rx).await {
+                Ok(Ok(answers)) => {
+                    let resp = serde_json::json!({
+                        "hookSpecificOutput": { "decision": { "updatedInput": { "answers": answers } } }
+                    });
+                    return Ok(Some(serde_json::to_string(&resp)?.into_bytes()));
                 }
-            } else {
-                let (tx, rx) = oneshot::channel::<PermissionResponse>();
-                let pending = PendingPermission {
-                    request_id: event.request_id.unwrap_or_default(),
-                    tool_name: event.tool_name.unwrap_or_default(),
-                    tool_input: event.tool_input.unwrap_or(serde_json::Value::Null),
-                    server_port: event.server_port.unwrap_or(4096),
-                    responder: tx,
-                };
+                _ => {}
+            }
+        } else {
+            let (tx, rx) = oneshot::channel::<PermissionResponse>();
+            let pending = PendingPermission {
+                request_id: event.request_id.unwrap_or_default(),
+                tool_name: event.tool_name.unwrap_or_default(),
+                tool_input: event.tool_input.unwrap_or(serde_json::Value::Null),
+                server_port: event.server_port.unwrap_or(4096),
+                responder: tx,
+            };
 
-                let s = state.read().await;
-                s.sessions.set_pending_permission(session_id.clone(), pending).await;
-                drop(s);
+            let s = state.read().await;
+            s.sessions.set_pending_permission(session_id.clone(), pending).await;
+            drop(s);
 
-                let _ = handle.emit("permission-asked", &session_id);
+            let _ = handle.emit("permission-asked", &session_id);
 
-                // Wait for response (held connection, 5 min timeout)
-                match tokio::time::timeout(
-                    std::time::Duration::from_secs(300),
-                    rx,
-                ).await {
-                    Ok(Ok(resp)) => {
-                        let response = serde_json::json!({
-                            "hookSpecificOutput": {
-                                "decision": {
-                                    "behavior": resp.behavior,
-                                    "reason": resp.reason
-                                }
-                            }
-                        });
-                        let _ = writer.write_all(serde_json::to_string(&response)?.as_bytes()).await;
-                    }
-                    _ => {}
+            match tokio::time::timeout(std::time::Duration::from_secs(300), rx).await {
+                Ok(Ok(resp)) => {
+                    let response = serde_json::json!({
+                        "hookSpecificOutput": { "decision": { "behavior": resp.behavior, "reason": resp.reason } }
+                    });
+                    return Ok(Some(serde_json::to_string(&response)?.into_bytes()));
                 }
+                _ => {}
             }
         }
 
-        Ok(())
+        Ok(None)
     }
 }
