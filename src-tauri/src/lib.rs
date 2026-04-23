@@ -4,6 +4,7 @@ mod sessions;
 mod socket;
 mod sound;
 mod platform;
+mod updater;
 
 use sessions::SessionStore;
 use socket::SocketServer;
@@ -137,11 +138,14 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_positioner::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             Some(vec![]),
         ))
         .manage(state.clone())
+        .manage(std::sync::Mutex::<Option<updater::PendingUpdate>>::new(None))
         .invoke_handler(tauri::generate_handler![
             get_sessions,
             approve_permission,
@@ -153,6 +157,8 @@ pub fn run() {
             get_platform_info,
             jump_to_terminal,
             uninstall_hooks,
+            updater::check_for_update,
+            updater::install_update,
         ])
         .setup(move |app| {
             let handle = app.handle().clone();
@@ -180,6 +186,9 @@ pub fn run() {
 
             // Platform-specific window setup
             platform::setup_window(app);
+
+            // Background update check (emits "update-available" to frontend)
+            tauri::async_runtime::spawn(updater::check_on_startup(app.handle().clone()));
 
             Ok(())
         })

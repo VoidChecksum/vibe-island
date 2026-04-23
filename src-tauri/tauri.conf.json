@@ -68,6 +68,14 @@
     }
   },
   "plugins": {
-    "shell": { "open": true }
+    "shell": { "open": true },
+    "updater": {
+      "pubkey": "",
+      "endpoints": [
+        "https://github.com/VoidChecksum/vibe-island/releases/latest/download/latest.json"
+      ],
+      "dialog": false,
+      "windows": { "installMode": "passive" }
+    }
   }
 }
