@@ -1,0 +1,16 @@
+{
+  "name": "terminal-focus",
+  "displayName": "Vibe Island Terminal Focus",
+  "description": "Focuses the terminal tab for a Vibe Island session",
+  "version": "1.0.0",
+  "publisher": "vibe-island",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "activationEvents": ["onUri"],
+  "main": "./extension.js",
+  "contributes": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VoidChecksum/vibe-island"
+  }
+}
