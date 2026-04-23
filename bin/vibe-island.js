@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-import { execSync, spawnSync } from "child_process";
-import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import { homedir } from "os";
 import { join } from "path";
 
 const VERSION = "1.0.0";
 const REPO = "VoidChecksum/vibe-island";
-const SOCKET = join(homedir(), ".vibe-island/run/vibe-island.sock");
+const SOCKET = process.platform === "win32"
+  ? "\\\\.\\pipe\\vibe-island"
+  : join(homedir(), ".vibe-island/run/vibe-island.sock");
 
 const CLAUDE_HOOK = `#!/usr/bin/env python3
 """Vibe Island hook — forwards Claude Code events to the notch."""
@@ -27,12 +28,30 @@ def get_tty():
     return None
 
 def send_event(data, held=False):
+    msg = json.dumps(data).encode()
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            k32 = ctypes.windll.kernel32
+            h = k32.CreateFileW(r"\\\\.\\pipe\\vibe-island", 0xC0000000, 0, None, 3, 0, None)
+            if h not in (0, 0xFFFFFFFF):
+                k32.WriteFile(h, msg, len(msg), ctypes.byref(ctypes.c_ulong(0)), None)
+                if held:
+                    buf = ctypes.create_string_buffer(65536)
+                    rd = ctypes.c_ulong(0)
+                    k32.ReadFile(h, buf, 65536, ctypes.byref(rd), None)
+                    k32.CloseHandle(h)
+                    return buf.raw[:rd.value].decode() if rd.value else None
+                k32.CloseHandle(h)
+                return True
+        except Exception: pass
+        return None
     for path in [SOCKET_PATH, FALLBACK_SOCKET]:
         try:
             s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             s.settimeout(300 if held else 3)
             s.connect(path)
-            s.sendall(json.dumps(data).encode())
+            s.sendall(msg)
             if held:
                 chunks = []
                 while True:
@@ -124,7 +143,7 @@ function installHooks() {
   const settingsPath = join(claudeDir, "settings.json");
   let settings = {};
   if (existsSync(settingsPath)) {
-    try { settings = JSON.parse(require("fs").readFileSync(settingsPath, "utf8")); } catch {}
+    try { settings = JSON.parse(readFileSync(settingsPath, "utf8")); } catch {}
   }
   if (!settings.hooks) settings.hooks = {};
   const entry = [{ type: "command", command: `python3 ${hookPath}`, timeout: 300000 }];
@@ -164,7 +183,6 @@ function showHelp() {
 }
 
 function checkStatus() {
-  const { existsSync } = await import("fs").catch(() => ({ existsSync }));
   if (existsSync(SOCKET)) {
     ok(`Socket exists: ${SOCKET}`);
     log("App is running or was recently running.");

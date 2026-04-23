@@ -96,12 +96,10 @@ fn tty_owner_pid(tty_path: &str) -> Option<u32> {
     let mut best_pid: Option<u32> = None;
     for entry in proc.flatten() {
         let pid_str = entry.file_name();
-        let pid: u32 = pid_str.to_string_lossy().parse().ok()?;
-        let stat_path = format!("/proc/{}/stat", pid);
-        if let Ok(stat) = std::fs::read_to_string(&stat_path) {
-            // field 7 (0-indexed) is tty_nr — we use fd/0 → readlink instead
-        }
-        let _ = stat_path; // suppress unused warning
+        let pid: u32 = match pid_str.to_string_lossy().parse() {
+            Ok(p) => p,
+            Err(_) => continue,
+        };
         let fd0 = format!("/proc/{}/fd/0", pid);
         if let Ok(link) = std::fs::read_link(&fd0) {
             if link.to_string_lossy().contains(tty_name) {
