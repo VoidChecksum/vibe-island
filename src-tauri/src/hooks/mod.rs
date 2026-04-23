@@ -124,7 +124,7 @@ impl HookInstaller {
 
         let hooks_obj = hooks.as_object_mut().ok_or("hooks not an object")?;
 
-        for event in &["PreToolUse", "PostToolUse", "Notification", "Stop"] {
+        for event in &["SessionStart", "UserPromptSubmit", "PreToolUse", "PostToolUse", "Notification", "Stop"] {
             if !hooks_obj.contains_key(*event) {
                 hooks_obj.insert(event.to_string(), hook_entry.clone());
             }
@@ -496,18 +496,19 @@ def main():
     tool_input_raw = os.environ.get("CLAUDE_TOOL_INPUT", "{}")
     user_prompt = os.environ.get("CLAUDE_USER_PROMPT", "")
 
-    stdin_data = {}
-    if not hook_event or not session_id:
-        try:
-            stdin_data = json.load(sys.stdin)
-            hook_event = stdin_data.get("hook_event_name", stdin_data.get("type", ""))
-            session_id = stdin_data.get("session_id", "")
-            cwd = stdin_data.get("cwd", cwd)
-            tool_name = stdin_data.get("tool_name", tool_name)
+    # Always try to read stdin — Claude Code sends JSON on stdin for every event.
+    # Merge: stdin wins for fields that env vars don't provide.
+    try:
+        stdin_data = json.load(sys.stdin)
+        hook_event = hook_event or stdin_data.get("hook_event_name", stdin_data.get("type", ""))
+        session_id = session_id or stdin_data.get("session_id", "")
+        cwd = cwd or stdin_data.get("cwd", os.getcwd())
+        tool_name = tool_name or stdin_data.get("tool_name", "")
+        if not tool_input_raw or tool_input_raw == "{}":
             tool_input_raw = json.dumps(stdin_data.get("tool_input", {}))
-            user_prompt = stdin_data.get("prompt", user_prompt)
-        except Exception:
-            return
+        user_prompt = user_prompt or stdin_data.get("prompt", "")
+    except Exception:
+        pass
 
     if not hook_event or not session_id:
         return
@@ -518,8 +519,9 @@ def main():
         tool_input = {}
 
     tty = get_tty()
+    bypass = os.environ.get("CLAUDE_BYPASS_PERMISSIONS", "") == "1"
     is_held = hook_event in ("PreToolUse",) and tool_name == "AskUserQuestion"
-    is_perm = hook_event == "PreToolUse" and tool_name not in ("", None, "AskUserQuestion")
+    is_perm = hook_event == "PreToolUse" and tool_name not in ("", None, "AskUserQuestion") and not bypass
 
     if hook_event == "UserPromptSubmit" and user_prompt:
         write_osc2(session_id, cwd, user_prompt)
@@ -527,9 +529,14 @@ def main():
     env_snapshot = {k: v for k, v in os.environ.items()
                     if k.startswith(("TERM", "TMUX", "SSH_", "HYPRLAND", "WAYLAND", "XDG_", "DISPLAY", "COLORTERM", "CLAUDE_BYPASS", "BYPASS_PERM"))}
 
+    # Remap to PermissionRequest so the Rust server holds the connection and
+    # routes through the approval/question UI. Without this the server closes
+    # the socket immediately and All clicks are silent no-ops.
+    wire_event_name = "PermissionRequest" if (is_held or is_perm) else hook_event
+
     event = {
         "session_id": session_id,
-        "hook_event_name": hook_event,
+        "hook_event_name": wire_event_name,
         "cwd": cwd,
         "tool_name": tool_name,
         "tool_input": tool_input,

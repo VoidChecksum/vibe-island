@@ -127,36 +127,56 @@ impl SessionStore {
 
     /// Handle an inbound hook event. Returns true if this is a permission/question request
     /// that needs a held connection.
+    fn make_session(event: &HookEvent) -> Session {
+        Session {
+            id: event.session_id.clone(),
+            source: event.source.clone().unwrap_or_else(|| "claude".into()),
+            status: SessionStatus::Active,
+            cwd: event.cwd.clone(),
+            last_user_text: None,
+            last_assistant_message: None,
+            tool_name: None,
+            tool_input: None,
+            title: None,
+            env: event.env.clone().unwrap_or_default(),
+            tty: event.tty.clone(),
+            terminal_bundle_id: None,
+            server_port: event.server_port,
+            started_at: Utc::now(),
+            last_activity: Utc::now(),
+            codex_model: None,
+            codex_permission_mode: None,
+            codex_thread_id: None,
+            codex_title: None,
+            subagent_parent_id: None,
+            subagent_nickname: None,
+            subagent_role: None,
+        }
+    }
+
     pub async fn handle_event(&self, event: &HookEvent) -> bool {
         let mut sessions = self.sessions.lock().await;
 
+        // Auto-create session on first event if it doesn't exist yet.
+        // Needed for tools (e.g. Claude Code) that don't fire a SessionStart hook.
+        if event.hook_event_name != "SessionEnd"
+            && !sessions.contains_key(&event.session_id)
+        {
+            sessions.insert(event.session_id.clone(), Self::make_session(event));
+        }
+
         match event.hook_event_name.as_str() {
             "SessionStart" => {
-                let session = Session {
-                    id: event.session_id.clone(),
-                    source: event.source.clone().unwrap_or_else(|| "claude".into()),
-                    status: SessionStatus::Active,
-                    cwd: event.cwd.clone(),
-                    last_user_text: None,
-                    last_assistant_message: None,
-                    tool_name: None,
-                    tool_input: None,
-                    title: None,
-                    env: event.env.clone().unwrap_or_default(),
-                    tty: event.tty.clone(),
-                    terminal_bundle_id: None,
-                    server_port: event.server_port,
-                    started_at: Utc::now(),
-                    last_activity: Utc::now(),
-                    codex_model: None,
-                    codex_permission_mode: None,
-                    codex_thread_id: None,
-                    codex_title: None,
-                    subagent_parent_id: None,
-                    subagent_nickname: None,
-                    subagent_role: None,
-                };
-                sessions.insert(event.session_id.clone(), session);
+                // Upsert: refresh fields in case session was auto-created earlier
+                let s = sessions
+                    .entry(event.session_id.clone())
+                    .or_insert_with(|| Self::make_session(event));
+                s.source = event.source.clone().unwrap_or_else(|| "claude".into());
+                s.cwd = event.cwd.clone();
+                s.env = event.env.clone().unwrap_or_default();
+                s.tty = event.tty.clone();
+                s.server_port = event.server_port;
+                s.last_activity = Utc::now();
                 false
             }
 
