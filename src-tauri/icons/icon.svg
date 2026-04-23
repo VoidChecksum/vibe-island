@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="glowGreen" cx="50%" cy="50%" r="45%">
+      <stop offset="0%" stop-color="#22c55e" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="roundedClip">
+      <rect width="512" height="512" rx="96" ry="96"/>
+    </clipPath>
+  </defs>
+
+  <!-- Dark rounded square background -->
+  <rect width="512" height="512" rx="96" ry="96" fill="#111111"/>
+
+  <!-- Subtle inner border -->
+  <rect width="512" height="512" rx="96" ry="96" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+
+  <!-- Green glow behind pet -->
+  <ellipse cx="256" cy="256" rx="160" ry="100" fill="url(#glowGreen)"/>
+
+  <!-- Pixel pet centered: 13x8 grid, each cell = 28px, offset so 13*28=364 centered in 512 = (512-364)/2=74, 8*28=224 centered = (512-224)/2=144 -->
+  <!-- Using scale factor of 28px per grid unit, offset x=74, y=144 -->
+  <g shape-rendering="crispEdges" transform="translate(74, 144)">
+    <!-- Left eye (2,2) bright green -->
+    <rect x="56" y="56" width="28" height="28" fill="#4ade80"/>
+    <!-- Right eye (5,2) bright green -->
+    <rect x="140" y="56" width="28" height="28" fill="#4ade80"/>
+
+    <!-- Body row 1 (1,3,6,1) green -->
+    <rect x="28" y="84" width="168" height="28" fill="#22c55e"/>
+    <!-- Left pupil (2,3) black -->
+    <rect x="56" y="84" width="28" height="28" fill="#000000"/>
+    <!-- Right pupil (5,3) black -->
+    <rect x="140" y="84" width="28" height="28" fill="#000000"/>
+
+    <!-- Body row 2 (1,4,6,1) green -->
+    <rect x="28" y="112" width="168" height="28" fill="#22c55e"/>
+
+    <!-- Left foot (2,5,2,1) green -->
+    <rect x="56" y="140" width="56" height="28" fill="#22c55e"/>
+    <!-- Right foot (5,5,2,1) green -->
+    <rect x="140" y="140" width="56" height="28" fill="#22c55e"/>
+  </g>
+</svg>
