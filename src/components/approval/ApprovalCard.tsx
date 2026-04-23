@@ -7,31 +7,72 @@ interface Props {
   session: Session;
 }
 
+interface DiffLine {
+  type: "context" | "add" | "remove" | "header";
+  content: string;
+  lineNum?: number;
+}
+
+function parseDiff(old_string: string, new_string: string): DiffLine[] {
+  if (!old_string && !new_string) return [];
+  const oldLines = (old_string || "").split("\n");
+  const newLines = (new_string || "").split("\n");
+  const lines: DiffLine[] = [];
+  const maxCtx = 4;
+  let ln = 1;
+  for (let i = 0; i < Math.max(oldLines.length, newLines.length) && i < maxCtx * 2 + 6; i++) {
+    const o = oldLines[i];
+    const n = newLines[i];
+    if (o !== undefined && n !== undefined && o !== n) {
+      lines.push({ type: "remove", content: o, lineNum: ln });
+      lines.push({ type: "add", content: n, lineNum: ln });
+    } else if (o !== undefined) {
+      lines.push({ type: "context", content: o, lineNum: ln });
+    } else if (n !== undefined) {
+      lines.push({ type: "add", content: n, lineNum: ln });
+    }
+    ln++;
+  }
+  return lines.slice(0, 12);
+}
+
 export function ApprovalCard({ session }: Props) {
   const { approvePermission, answerQuestion, jumpToTerminal } = useStore();
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const isQuestion = session.status === "waiting_for_answer";
   const toolName = session.tool_name || "Unknown";
   const toolInput = (session.tool_input || {}) as Record<string, unknown>;
 
-  const questions = (toolInput.questions as Array<{ header: string; question: string }>) || [];
+  const questions = (toolInput.questions as Array<{ header: string; question: string; options?: string[] }>) || [];
+  const topQuestion = questions[0];
+  const options: string[] = topQuestion?.options || [];
+
+  const getFilePath = () => {
+    if (toolInput.file_path) return String(toolInput.file_path);
+    if (toolInput.path) return String(toolInput.path);
+    return null;
+  };
 
   const getDetail = () => {
     if (toolInput.command) return String(toolInput.command);
     if (toolInput.file_path) return String(toolInput.file_path);
     if (Array.isArray(toolInput.patterns) && toolInput.patterns.length > 0) {
-      return (toolInput.patterns as string[]).join(" && ");
+      return (toolInput.patterns as string[]).join(", ");
     }
     return null;
   };
 
+  const isEditTool = ["Edit", "Write", "MultiEdit"].includes(toolName);
+  const diffLines = isEditTool
+    ? parseDiff(String(toolInput.old_string || ""), String(toolInput.new_string || ""))
+    : [];
+  const filePath = getFilePath();
   const detail = getDetail();
 
-  const handleAnswerSubmit = () => {
+  const handleOptionClick = (i: number) => {
+    setSelectedOption(i);
     const answerMap: Record<string, string[]> = {};
-    for (const q of questions) {
-      if (answers[q.header]) answerMap[q.header] = [answers[q.header]];
-    }
+    if (topQuestion) answerMap[topQuestion.header] = [String(i + 1)];
     answerQuestion(session.id, answerMap);
   };
 
@@ -45,53 +86,51 @@ export function ApprovalCard({ session }: Props) {
         style={{ background: "rgba(192,132,252,0.08)", border: "1px solid rgba(192,132,252,0.15)" }}
       >
         <div className="flex items-center gap-1.5 mb-2">
+          <span className="text-[10px]" style={{ color: "#6b7280" }}>● </span>
           <span className="text-[11px] font-medium" style={{ color: "var(--vi-question)" }}>
-            {session.source === "claude" ? "Claude" : session.source} is waiting for an answer
+            Claude asks
           </span>
         </div>
 
-        {questions.length > 0 ? (
-          <div className="space-y-1.5 mb-2">
-            {questions.map((q, i) => (
-              <div key={i}>
-                <p className="text-[10px] mb-1" style={{ color: "rgba(255,255,255,0.5)" }}>
-                  {q.question}
-                </p>
-                <input
-                  type="text"
-                  value={answers[q.header] || ""}
-                  onChange={(e) => setAnswers((a) => ({ ...a, [q.header]: e.target.value }))}
-                  onKeyDown={(e) => e.key === "Enter" && handleAnswerSubmit()}
-                  placeholder="Your answer…"
-                  className="w-full px-2 py-1 rounded-[6px] text-[11px] outline-none"
-                  style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(192,132,252,0.2)", color: "#fff" }}
-                  data-no-drag
-                />
-              </div>
+        {topQuestion && (
+          <p className="text-[11px] mb-2 font-medium" style={{ color: "rgba(255,255,255,0.85)" }}>
+            {topQuestion.question}
+          </p>
+        )}
+
+        {options.length > 0 ? (
+          <div className="space-y-1" data-no-drag>
+            {options.map((opt, i) => (
+              <button
+                key={i}
+                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-[6px] text-left transition-all"
+                style={{
+                  background: selectedOption === i ? "rgba(192,132,252,0.2)" : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${selectedOption === i ? "rgba(192,132,252,0.4)" : "rgba(255,255,255,0.06)"}`,
+                  cursor: "pointer",
+                }}
+                data-no-drag
+                onClick={() => handleOptionClick(i)}
+              >
+                <span
+                  className="text-[9px] px-1.5 py-0.5 rounded font-mono"
+                  style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)" }}
+                >
+                  #{i + 1}
+                </span>
+                <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.8)" }}>{opt}</span>
+              </button>
             ))}
-            <button
-              className="approve-btn allow mt-1"
-              style={{ width: "100%" }}
-              data-no-drag
-              onClick={handleAnswerSubmit}
-            >
-              Submit Answer
-            </button>
           </div>
         ) : (
-          <>
-            <p className="text-[10px] mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>
-              Please answer in the terminal
-            </p>
-            <button
-              className="approve-btn allow"
-              style={{ width: "100%" }}
-              data-no-drag
-              onClick={() => jumpToTerminal(session.id)}
-            >
-              Go to Terminal
-            </button>
-          </>
+          <button
+            className="approve-btn allow"
+            style={{ width: "100%" }}
+            data-no-drag
+            onClick={() => jumpToTerminal(session.id)}
+          >
+            Go to Terminal
+          </button>
         )}
       </motion.div>
     );
@@ -102,35 +141,99 @@ export function ApprovalCard({ session }: Props) {
       initial={{ opacity: 0, height: 0 }}
       animate={{ opacity: 1, height: "auto" }}
       exit={{ opacity: 0, height: 0 }}
-      className="mx-1.5 mb-1 p-2.5 rounded-[10px]"
+      className="mx-1.5 mb-1 rounded-[10px] overflow-hidden"
       style={{ background: "rgba(249,115,22,0.06)", border: "1px solid rgba(249,115,22,0.12)" }}
     >
-      <div className="flex items-center gap-1.5 mb-1.5">
-        <span className="text-[11px] font-medium" style={{ color: "var(--vi-alert)" }}>{toolName}</span>
+      {/* Deny / Allow bar at top */}
+      <div className="flex gap-1.5 p-2 pb-0">
+        <button
+          className="approve-btn deny flex-1"
+          data-no-drag
+          onClick={() => approvePermission(session.id, "deny")}
+        >
+          Deny <span style={{ opacity: 0.4, fontSize: "9px" }}>⌘⌫</span>
+        </button>
+        <button
+          className="approve-btn allow flex-1"
+          data-no-drag
+          onClick={() => approvePermission(session.id, "allow")}
+        >
+          Allow <span style={{ opacity: 0.4, fontSize: "9px" }}>⌘Y</span>
+        </button>
       </div>
 
-      {detail && (
-        <div className="mb-2 px-2 py-1.5 rounded-[6px] overflow-hidden" style={{ background: "rgba(0,0,0,0.3)" }}>
-          <code
-            className="text-[10px] break-all leading-relaxed"
-            style={{
-              color: "rgba(255,255,255,0.5)",
-              fontFamily: "'SF Mono','Fira Code','Cascadia Code',monospace",
-              display: "-webkit-box",
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-            } as React.CSSProperties}
-          >
-            {detail}
-          </code>
+      <div className="px-2.5 pt-2 pb-2.5">
+        <div className="flex items-center gap-1.5 mb-1.5">
+          <span className="text-[11px] font-medium" style={{ color: "var(--vi-alert)" }}>{toolName}</span>
+          {filePath && (
+            <span className="text-[10px]" style={{ color: "#6b7280" }}>
+              {filePath.split("/").slice(-2).join("/")}
+            </span>
+          )}
         </div>
-      )}
 
-      <div className="approve-bar">
-        <button className="approve-btn deny" data-no-drag onClick={() => approvePermission(session.id, "deny")}>Deny</button>
-        <button className="approve-btn allow" data-no-drag onClick={() => approvePermission(session.id, "allow")}>Allow Once</button>
-        <button className="approve-btn always" data-no-drag onClick={() => approvePermission(session.id, "always")}>Always Allow</button>
+        {/* Diff view for Edit/Write tools */}
+        {isEditTool && diffLines.length > 0 && (
+          <div
+            className="rounded-[6px] overflow-hidden mb-1.5"
+            style={{ background: "rgba(0,0,0,0.4)", fontSize: "10px", fontFamily: "monospace" }}
+          >
+            {filePath && (
+              <div className="px-2 py-1" style={{ background: "rgba(255,255,255,0.04)", color: "#6b7280" }}>
+                {filePath}
+              </div>
+            )}
+            {diffLines.map((line, i) => (
+              <div
+                key={i}
+                className="px-2 py-0.5 flex gap-2"
+                style={{
+                  background:
+                    line.type === "add" ? "rgba(52,211,153,0.1)" :
+                    line.type === "remove" ? "rgba(248,113,113,0.1)" :
+                    "transparent",
+                  color:
+                    line.type === "add" ? "#34d399" :
+                    line.type === "remove" ? "#f87171" :
+                    "rgba(255,255,255,0.4)",
+                }}
+              >
+                <span style={{ opacity: 0.4, width: "10px" }}>
+                  {line.type === "add" ? "+" : line.type === "remove" ? "-" : " "}
+                </span>
+                <span className="truncate">{line.content}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Detail for non-Edit tools */}
+        {!isEditTool && detail && (
+          <div className="mb-1.5 px-2 py-1.5 rounded-[6px] overflow-hidden" style={{ background: "rgba(0,0,0,0.3)" }}>
+            <code
+              className="text-[10px] break-all leading-relaxed"
+              style={{
+                color: "rgba(255,255,255,0.5)",
+                fontFamily: "'SF Mono','Fira Code','Cascadia Code',monospace",
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              } as React.CSSProperties}
+            >
+              {detail}
+            </code>
+          </div>
+        )}
+
+        <button
+          className="w-full text-[9px] text-center mt-0.5"
+          style={{ color: "var(--vi-explore)", opacity: 0.6 }}
+          data-no-drag
+          onClick={() => jumpToTerminal(session.id)}
+        >
+          Always Allow
+        </button>
       </div>
     </motion.div>
   );
