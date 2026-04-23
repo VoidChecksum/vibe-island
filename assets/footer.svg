@@ -1,15 +1,51 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 60">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 80" width="1200" height="80">
   <defs>
-    <linearGradient id="line" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#0D1117;stop-opacity:1" />
-      <stop offset="20%" style="stop-color:#00D4FF;stop-opacity:0.6" />
-      <stop offset="50%" style="stop-color:#A78BFA;stop-opacity:0.6" />
-      <stop offset="80%" style="stop-color:#00D4FF;stop-opacity:0.6" />
-      <stop offset="100%" style="stop-color:#0D1117;stop-opacity:1" />
+    <linearGradient id="topGlowLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0a0a0a" stop-opacity="1"/>
+      <stop offset="20%" stop-color="#22c55e" stop-opacity="0.5"/>
+      <stop offset="50%" stop-color="#f97316" stop-opacity="0.4"/>
+      <stop offset="80%" stop-color="#22c55e" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#0a0a0a" stop-opacity="1"/>
     </linearGradient>
   </defs>
-  <rect width="900" height="60" fill="transparent" />
-  <line x1="50" y1="15" x2="850" y2="15" stroke="url(#line)" stroke-width="1" />
-  <text x="450" y="40" font-family="monospace" font-size="11" fill="#555" text-anchor="middle">Built with Tauri v2 + React + Rust — No license, no telemetry, no limits</text>
-  <text x="450" y="54" font-family="monospace" font-size="9" fill="#444" text-anchor="middle">GPL-3.0 License · github.com/VoidChecksum/vibe-island</text>
+
+  <!-- Background -->
+  <rect width="1200" height="80" fill="#0a0a0a"/>
+
+  <!-- Top border line -->
+  <line x1="0" y1="0" x2="1200" y2="0" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+  <!-- Subtle green/orange glow line at top edge -->
+  <rect x="100" y="0" width="1000" height="1.5" fill="url(#topGlowLine)" opacity="0.7"/>
+
+  <!-- Centered content: pet + text -->
+  <!-- Pixel pet at 2px scale: 13*2=26w, 8*2=16h, centered vertically in 80px = y_offset=(80-16)/2=32 -->
+  <g shape-rendering="crispEdges" transform="translate(409, 32)">
+    <!-- Left eye (2,2) bright green -->
+    <rect x="4" y="4" width="2" height="2" fill="#4ade80"/>
+    <!-- Right eye (5,2) bright green -->
+    <rect x="10" y="4" width="2" height="2" fill="#4ade80"/>
+    <!-- Body row 1 (1,3,6,1) green -->
+    <rect x="2" y="6" width="12" height="2" fill="#22c55e"/>
+    <!-- Left pupil (2,3) black -->
+    <rect x="4" y="6" width="2" height="2" fill="#000000"/>
+    <!-- Right pupil (5,3) black -->
+    <rect x="10" y="6" width="2" height="2" fill="#000000"/>
+    <!-- Body row 2 (1,4,6,1) green -->
+    <rect x="2" y="8" width="12" height="2" fill="#22c55e"/>
+    <!-- Left foot (2,5,2,1) green -->
+    <rect x="4" y="10" width="4" height="2" fill="#22c55e"/>
+    <!-- Right foot (5,5,2,1) green -->
+    <rect x="10" y="10" width="4" height="2" fill="#22c55e"/>
+  </g>
+
+  <!-- "VIBE ISLAND" text -->
+  <text x="449" y="45" font-family="'Courier New', 'Lucida Console', monospace" font-size="13" font-weight="700" fill="#f0f0f0" letter-spacing="3">VIBE ISLAND</text>
+
+  <!-- Vertical separator -->
+  <line x1="558" y1="33" x2="558" y2="47" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+
+  <!-- Subtitle text -->
+  <text x="570" y="45" font-family="'Courier New', 'Lucida Console', monospace" font-size="12" fill="#6b7280" letter-spacing="0.5">Dynamic Island for AI agents</text>
 </svg>

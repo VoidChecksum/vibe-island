@@ -1,8 +1,5 @@
-<h1 align="center">Vibe Island</h1>
-
 <p align="center">
-  <b>A Dynamic Island for your AI coding tools.</b><br/>
-  <sub>Monitor sessions · Approve permissions · Jump to any terminal · Sound effects · Zero config</sub>
+  <img src="assets/banner.svg" alt="Vibe Island" width="900" />
 </p>
 
 <p align="center">
@@ -300,40 +297,9 @@ npx tauri dev
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         Vibe Island                              │
-├─────────────────────────┬───────────────────────────────────────┤
-│     Rust Backend        │         React Frontend                │
-│                         │                                       │
-│  ┌─────────────────┐    │    ┌──────────────────────┐           │
-│  │  SocketServer   │    │    │    NotchPanel         │           │
-│  │  ~/.vibe-island │◄───┼───►│    ├─ SessionRow      │           │
-│  │  /run/*.sock    │    │    │    ├─ ApprovalCard     │           │
-│  └────────┬────────┘    │    │    └─ PixelPet         │           │
-│           │             │    └──────────────────────┘           │
-│  ┌────────▼────────┐    │    ┌──────────────────────┐           │
-│  │  SessionStore   │    │    │    SettingsPanel      │           │
-│  │  (Arc<RwLock>)  │────┼───►│    Behavior/Display/  │           │
-│  └────────┬────────┘    │    │    Integrations/Adv.  │           │
-│           │             │    └──────────────────────┘           │
-│  ┌────────▼────────┐    │                                       │
-│  │  HookInstaller  │    │    State: Zustand                     │
-│  │  14 tools       │    │    IPC: Tauri events + commands       │
-│  │  Claude/Codex/  │    │    UI: Tailwind + Framer Motion       │
-│  │  Amp/Kimi/Kiro  │    │    Proto: vi-e7c4, OSC2 cache        │
-│  └────────┬────────┘    │                                       │
-│           │             │                                       │
-│  ┌────────▼────────┐    │                                       │
-│  │  Platform       │    │                                       │
-│  │  jump_to_       │    │                                       │
-│  │  terminal()     │    │                                       │
-│  │  13+ terminals  │    │                                       │
-│  └─────────────────┘    │                                       │
-├─────────────────────────┴───────────────────────────────────────┤
-│  Hook → ~/.vibe-island/run/vibe-island.sock → Tauri IPC → React │
-└─────────────────────────────────────────────────────────────────┘
-```
+<p align="center">
+  <img src="assets/arch.svg" alt="Architecture" width="700" />
+</p>
 
 ### Data Flow
 

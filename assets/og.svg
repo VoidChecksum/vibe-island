@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <radialGradient id="petGlowOG" cx="50%" cy="38%" r="35%">
+      <stop offset="0%" stop-color="#22c55e" stop-opacity="0.4"/>
+      <stop offset="70%" stop-color="#22c55e" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1a1a1a" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#111111" stop-opacity="1"/>
+    </radialGradient>
+    <filter id="greenGlow">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Dot grid pattern -->
+  <g fill="#ffffff" opacity="0.035">
+    <!-- Generate dots every 20px for 1200x630 -->
+    <rect width="1200" height="630" fill="none"/>
+    <!-- Use a pattern approach via repeated rects would be too verbose; use a simple path pattern -->
+    <!-- Approximate dot grid with small circles at key positions -->
+    <!-- Top section dots -->
+    <circle cx="40" cy="40" r="0.9"/><circle cx="80" cy="40" r="0.9"/><circle cx="120" cy="40" r="0.9"/><circle cx="160" cy="40" r="0.9"/><circle cx="200" cy="40" r="0.9"/><circle cx="240" cy="40" r="0.9"/><circle cx="280" cy="40" r="0.9"/><circle cx="320" cy="40" r="0.9"/><circle cx="360" cy="40" r="0.9"/><circle cx="400" cy="40" r="0.9"/><circle cx="440" cy="40" r="0.9"/><circle cx="480" cy="40" r="0.9"/><circle cx="520" cy="40" r="0.9"/><circle cx="560" cy="40" r="0.9"/><circle cx="600" cy="40" r="0.9"/><circle cx="640" cy="40" r="0.9"/><circle cx="680" cy="40" r="0.9"/><circle cx="720" cy="40" r="0.9"/><circle cx="760" cy="40" r="0.9"/><circle cx="800" cy="40" r="0.9"/><circle cx="840" cy="40" r="0.9"/><circle cx="880" cy="40" r="0.9"/><circle cx="920" cy="40" r="0.9"/><circle cx="960" cy="40" r="0.9"/><circle cx="1000" cy="40" r="0.9"/><circle cx="1040" cy="40" r="0.9"/><circle cx="1080" cy="40" r="0.9"/><circle cx="1120" cy="40" r="0.9"/><circle cx="1160" cy="40" r="0.9"/>
+    <circle cx="40" cy="80" r="0.9"/><circle cx="80" cy="80" r="0.9"/><circle cx="120" cy="80" r="0.9"/><circle cx="160" cy="80" r="0.9"/><circle cx="200" cy="80" r="0.9"/><circle cx="240" cy="80" r="0.9"/><circle cx="280" cy="80" r="0.9"/><circle cx="320" cy="80" r="0.9"/><circle cx="360" cy="80" r="0.9"/><circle cx="400" cy="80" r="0.9"/><circle cx="440" cy="80" r="0.9"/><circle cx="480" cy="80" r="0.9"/><circle cx="520" cy="80" r="0.9"/><circle cx="560" cy="80" r="0.9"/><circle cx="600" cy="80" r="0.9"/><circle cx="640" cy="80" r="0.9"/><circle cx="680" cy="80" r="0.9"/><circle cx="720" cy="80" r="0.9"/><circle cx="760" cy="80" r="0.9"/><circle cx="800" cy="80" r="0.9"/><circle cx="840" cy="80" r="0.9"/><circle cx="880" cy="80" r="0.9"/><circle cx="920" cy="80" r="0.9"/><circle cx="960" cy="80" r="0.9"/><circle cx="1000" cy="80" r="0.9"/><circle cx="1040" cy="80" r="0.9"/><circle cx="1080" cy="80" r="0.9"/><circle cx="1120" cy="80" r="0.9"/><circle cx="1160" cy="80" r="0.9"/>
+    <circle cx="40" cy="120" r="0.9"/><circle cx="80" cy="120" r="0.9"/><circle cx="120" cy="120" r="0.9"/><circle cx="160" cy="120" r="0.9"/><circle cx="200" cy="120" r="0.9"/><circle cx="240" cy="120" r="0.9"/><circle cx="280" cy="120" r="0.9"/><circle cx="320" cy="120" r="0.9"/><circle cx="360" cy="120" r="0.9"/><circle cx="400" cy="120" r="0.9"/><circle cx="440" cy="120" r="0.9"/><circle cx="480" cy="120" r="0.9"/><circle cx="520" cy="120" r="0.9"/><circle cx="560" cy="120" r="0.9"/><circle cx="600" cy="120" r="0.9"/><circle cx="640" cy="120" r="0.9"/><circle cx="680" cy="120" r="0.9"/><circle cx="720" cy="120" r="0.9"/><circle cx="760" cy="120" r="0.9"/><circle cx="800" cy="120" r="0.9"/><circle cx="840" cy="120" r="0.9"/><circle cx="880" cy="120" r="0.9"/><circle cx="920" cy="120" r="0.9"/><circle cx="960" cy="120" r="0.9"/><circle cx="1000" cy="120" r="0.9"/><circle cx="1040" cy="120" r="0.9"/><circle cx="1080" cy="120" r="0.9"/><circle cx="1120" cy="120" r="0.9"/><circle cx="1160" cy="120" r="0.9"/>
+    <circle cx="40" cy="160" r="0.9"/><circle cx="80" cy="160" r="0.9"/><circle cx="120" cy="160" r="0.9"/><circle cx="160" cy="160" r="0.9"/><circle cx="200" cy="160" r="0.9"/><circle cx="240" cy="160" r="0.9"/><circle cx="280" cy="160" r="0.9"/><circle cx="320" cy="160" r="0.9"/><circle cx="360" cy="160" r="0.9"/><circle cx="400" cy="160" r="0.9"/><circle cx="440" cy="160" r="0.9"/><circle cx="480" cy="160" r="0.9"/><circle cx="520" cy="160" r="0.9"/><circle cx="560" cy="160" r="0.9"/><circle cx="600" cy="160" r="0.9"/><circle cx="640" cy="160" r="0.9"/><circle cx="680" cy="160" r="0.9"/><circle cx="720" cy="160" r="0.9"/><circle cx="760" cy="160" r="0.9"/><circle cx="800" cy="160" r="0.9"/><circle cx="840" cy="160" r="0.9"/><circle cx="880" cy="160" r="0.9"/><circle cx="920" cy="160" r="0.9"/><circle cx="960" cy="160" r="0.9"/><circle cx="1000" cy="160" r="0.9"/><circle cx="1040" cy="160" r="0.9"/><circle cx="1080" cy="160" r="0.9"/><circle cx="1120" cy="160" r="0.9"/><circle cx="1160" cy="160" r="0.9"/>
+    <circle cx="40" cy="200" r="0.9"/><circle cx="80" cy="200" r="0.9"/><circle cx="120" cy="200" r="0.9"/><circle cx="160" cy="200" r="0.9"/><circle cx="200" cy="200" r="0.9"/><circle cx="240" cy="200" r="0.9"/><circle cx="280" cy="200" r="0.9"/><circle cx="320" cy="200" r="0.9"/><circle cx="360" cy="200" r="0.9"/><circle cx="400" cy="200" r="0.9"/><circle cx="440" cy="200" r="0.9"/><circle cx="480" cy="200" r="0.9"/><circle cx="520" cy="200" r="0.9"/><circle cx="560" cy="200" r="0.9"/><circle cx="600" cy="200" r="0.9"/><circle cx="640" cy="200" r="0.9"/><circle cx="680" cy="200" r="0.9"/><circle cx="720" cy="200" r="0.9"/><circle cx="760" cy="200" r="0.9"/><circle cx="800" cy="200" r="0.9"/><circle cx="840" cy="200" r="0.9"/><circle cx="880" cy="200" r="0.9"/><circle cx="920" cy="200" r="0.9"/><circle cx="960" cy="200" r="0.9"/><circle cx="1000" cy="200" r="0.9"/><circle cx="1040" cy="200" r="0.9"/><circle cx="1080" cy="200" r="0.9"/><circle cx="1120" cy="200" r="0.9"/><circle cx="1160" cy="200" r="0.9"/>
+    <circle cx="40" cy="240" r="0.9"/><circle cx="80" cy="240" r="0.9"/><circle cx="120" cy="240" r="0.9"/><circle cx="160" cy="240" r="0.9"/><circle cx="200" cy="240" r="0.9"/><circle cx="240" cy="240" r="0.9"/><circle cx="280" cy="240" r="0.9"/><circle cx="320" cy="240" r="0.9"/><circle cx="360" cy="240" r="0.9"/><circle cx="400" cy="240" r="0.9"/><circle cx="440" cy="240" r="0.9"/><circle cx="480" cy="240" r="0.9"/><circle cx="520" cy="240" r="0.9"/><circle cx="560" cy="240" r="0.9"/><circle cx="600" cy="240" r="0.9"/><circle cx="640" cy="240" r="0.9"/><circle cx="680" cy="240" r="0.9"/><circle cx="720" cy="240" r="0.9"/><circle cx="760" cy="240" r="0.9"/><circle cx="800" cy="240" r="0.9"/><circle cx="840" cy="240" r="0.9"/><circle cx="880" cy="240" r="0.9"/><circle cx="920" cy="240" r="0.9"/><circle cx="960" cy="240" r="0.9"/><circle cx="1000" cy="240" r="0.9"/><circle cx="1040" cy="240" r="0.9"/><circle cx="1080" cy="240" r="0.9"/><circle cx="1120" cy="240" r="0.9"/><circle cx="1160" cy="240" r="0.9"/>
+    <circle cx="40" cy="280" r="0.9"/><circle cx="80" cy="280" r="0.9"/><circle cx="120" cy="280" r="0.9"/><circle cx="160" cy="280" r="0.9"/><circle cx="200" cy="280" r="0.9"/><circle cx="240" cy="280" r="0.9"/><circle cx="280" cy="280" r="0.9"/><circle cx="320" cy="280" r="0.9"/><circle cx="360" cy="280" r="0.9"/><circle cx="400" cy="280" r="0.9"/><circle cx="440" cy="280" r="0.9"/><circle cx="480" cy="280" r="0.9"/><circle cx="520" cy="280" r="0.9"/><circle cx="560" cy="280" r="0.9"/><circle cx="600" cy="280" r="0.9"/><circle cx="640" cy="280" r="0.9"/><circle cx="680" cy="280" r="0.9"/><circle cx="720" cy="280" r="0.9"/><circle cx="760" cy="280" r="0.9"/><circle cx="800" cy="280" r="0.9"/><circle cx="840" cy="280" r="0.9"/><circle cx="880" cy="280" r="0.9"/><circle cx="920" cy="280" r="0.9"/><circle cx="960" cy="280" r="0.9"/><circle cx="1000" cy="280" r="0.9"/><circle cx="1040" cy="280" r="0.9"/><circle cx="1080" cy="280" r="0.9"/><circle cx="1120" cy="280" r="0.9"/><circle cx="1160" cy="280" r="0.9"/>
+    <circle cx="40" cy="320" r="0.9"/><circle cx="80" cy="320" r="0.9"/><circle cx="120" cy="320" r="0.9"/><circle cx="160" cy="320" r="0.9"/><circle cx="200" cy="320" r="0.9"/><circle cx="240" cy="320" r="0.9"/><circle cx="280" cy="320" r="0.9"/><circle cx="320" cy="320" r="0.9"/><circle cx="360" cy="320" r="0.9"/><circle cx="400" cy="320" r="0.9"/><circle cx="440" cy="320" r="0.9"/><circle cx="480" cy="320" r="0.9"/><circle cx="520" cy="320" r="0.9"/><circle cx="560" cy="320" r="0.9"/><circle cx="600" cy="320" r="0.9"/><circle cx="640" cy="320" r="0.9"/><circle cx="680" cy="320" r="0.9"/><circle cx="720" cy="320" r="0.9"/><circle cx="760" cy="320" r="0.9"/><circle cx="800" cy="320" r="0.9"/><circle cx="840" cy="320" r="0.9"/><circle cx="880" cy="320" r="0.9"/><circle cx="920" cy="320" r="0.9"/><circle cx="960" cy="320" r="0.9"/><circle cx="1000" cy="320" r="0.9"/><circle cx="1040" cy="320" r="0.9"/><circle cx="1080" cy="320" r="0.9"/><circle cx="1120" cy="320" r="0.9"/><circle cx="1160" cy="320" r="0.9"/>
+    <circle cx="40" cy="360" r="0.9"/><circle cx="80" cy="360" r="0.9"/><circle cx="120" cy="360" r="0.9"/><circle cx="160" cy="360" r="0.9"/><circle cx="200" cy="360" r="0.9"/><circle cx="240" cy="360" r="0.9"/><circle cx="280" cy="360" r="0.9"/><circle cx="320" cy="360" r="0.9"/><circle cx="360" cy="360" r="0.9"/><circle cx="400" cy="360" r="0.9"/><circle cx="440" cy="360" r="0.9"/><circle cx="480" cy="360" r="0.9"/><circle cx="520" cy="360" r="0.9"/><circle cx="560" cy="360" r="0.9"/><circle cx="600" cy="360" r="0.9"/><circle cx="640" cy="360" r="0.9"/><circle cx="680" cy="360" r="0.9"/><circle cx="720" cy="360" r="0.9"/><circle cx="760" cy="360" r="0.9"/><circle cx="800" cy="360" r="0.9"/><circle cx="840" cy="360" r="0.9"/><circle cx="880" cy="360" r="0.9"/><circle cx="920" cy="360" r="0.9"/><circle cx="960" cy="360" r="0.9"/><circle cx="1000" cy="360" r="0.9"/><circle cx="1040" cy="360" r="0.9"/><circle cx="1080" cy="360" r="0.9"/><circle cx="1120" cy="360" r="0.9"/><circle cx="1160" cy="360" r="0.9"/>
+    <circle cx="40" cy="400" r="0.9"/><circle cx="80" cy="400" r="0.9"/><circle cx="120" cy="400" r="0.9"/><circle cx="160" cy="400" r="0.9"/><circle cx="200" cy="400" r="0.9"/><circle cx="240" cy="400" r="0.9"/><circle cx="280" cy="400" r="0.9"/><circle cx="320" cy="400" r="0.9"/><circle cx="360" cy="400" r="0.9"/><circle cx="400" cy="400" r="0.9"/><circle cx="440" cy="400" r="0.9"/><circle cx="480" cy="400" r="0.9"/><circle cx="520" cy="400" r="0.9"/><circle cx="560" cy="400" r="0.9"/><circle cx="600" cy="400" r="0.9"/><circle cx="640" cy="400" r="0.9"/><circle cx="680" cy="400" r="0.9"/><circle cx="720" cy="400" r="0.9"/><circle cx="760" cy="400" r="0.9"/><circle cx="800" cy="400" r="0.9"/><circle cx="840" cy="400" r="0.9"/><circle cx="880" cy="400" r="0.9"/><circle cx="920" cy="400" r="0.9"/><circle cx="960" cy="400" r="0.9"/><circle cx="1000" cy="400" r="0.9"/><circle cx="1040" cy="400" r="0.9"/><circle cx="1080" cy="400" r="0.9"/><circle cx="1120" cy="400" r="0.9"/><circle cx="1160" cy="400" r="0.9"/>
+    <circle cx="40" cy="440" r="0.9"/><circle cx="80" cy="440" r="0.9"/><circle cx="120" cy="440" r="0.9"/><circle cx="160" cy="440" r="0.9"/><circle cx="200" cy="440" r="0.9"/><circle cx="240" cy="440" r="0.9"/><circle cx="280" cy="440" r="0.9"/><circle cx="320" cy="440" r="0.9"/><circle cx="360" cy="440" r="0.9"/><circle cx="400" cy="440" r="0.9"/><circle cx="440" cy="440" r="0.9"/><circle cx="480" cy="440" r="0.9"/><circle cx="520" cy="440" r="0.9"/><circle cx="560" cy="440" r="0.9"/><circle cx="600" cy="440" r="0.9"/><circle cx="640" cy="440" r="0.9"/><circle cx="680" cy="440" r="0.9"/><circle cx="720" cy="440" r="0.9"/><circle cx="760" cy="440" r="0.9"/><circle cx="800" cy="440" r="0.9"/><circle cx="840" cy="440" r="0.9"/><circle cx="880" cy="440" r="0.9"/><circle cx="920" cy="440" r="0.9"/><circle cx="960" cy="440" r="0.9"/><circle cx="1000" cy="440" r="0.9"/><circle cx="1040" cy="440" r="0.9"/><circle cx="1080" cy="440" r="0.9"/><circle cx="1120" cy="440" r="0.9"/><circle cx="1160" cy="440" r="0.9"/>
+    <circle cx="40" cy="480" r="0.9"/><circle cx="80" cy="480" r="0.9"/><circle cx="120" cy="480" r="0.9"/><circle cx="160" cy="480" r="0.9"/><circle cx="200" cy="480" r="0.9"/><circle cx="240" cy="480" r="0.9"/><circle cx="280" cy="480" r="0.9"/><circle cx="320" cy="480" r="0.9"/><circle cx="360" cy="480" r="0.9"/><circle cx="400" cy="480" r="0.9"/><circle cx="440" cy="480" r="0.9"/><circle cx="480" cy="480" r="0.9"/><circle cx="520" cy="480" r="0.9"/><circle cx="560" cy="480" r="0.9"/><circle cx="600" cy="480" r="0.9"/><circle cx="640" cy="480" r="0.9"/><circle cx="680" cy="480" r="0.9"/><circle cx="720" cy="480" r="0.9"/><circle cx="760" cy="480" r="0.9"/><circle cx="800" cy="480" r="0.9"/><circle cx="840" cy="480" r="0.9"/><circle cx="880" cy="480" r="0.9"/><circle cx="920" cy="480" r="0.9"/><circle cx="960" cy="480" r="0.9"/><circle cx="1000" cy="480" r="0.9"/><circle cx="1040" cy="480" r="0.9"/><circle cx="1080" cy="480" r="0.9"/><circle cx="1120" cy="480" r="0.9"/><circle cx="1160" cy="480" r="0.9"/>
+    <circle cx="40" cy="520" r="0.9"/><circle cx="80" cy="520" r="0.9"/><circle cx="120" cy="520" r="0.9"/><circle cx="160" cy="520" r="0.9"/><circle cx="200" cy="520" r="0.9"/><circle cx="240" cy="520" r="0.9"/><circle cx="280" cy="520" r="0.9"/><circle cx="320" cy="520" r="0.9"/><circle cx="360" cy="520" r="0.9"/><circle cx="400" cy="520" r="0.9"/><circle cx="440" cy="520" r="0.9"/><circle cx="480" cy="520" r="0.9"/><circle cx="520" cy="520" r="0.9"/><circle cx="560" cy="520" r="0.9"/><circle cx="600" cy="520" r="0.9"/><circle cx="640" cy="520" r="0.9"/><circle cx="680" cy="520" r="0.9"/><circle cx="720" cy="520" r="0.9"/><circle cx="760" cy="520" r="0.9"/><circle cx="800" cy="520" r="0.9"/><circle cx="840" cy="520" r="0.9"/><circle cx="880" cy="520" r="0.9"/><circle cx="920" cy="520" r="0.9"/><circle cx="960" cy="520" r="0.9"/><circle cx="1000" cy="520" r="0.9"/><circle cx="1040" cy="520" r="0.9"/><circle cx="1080" cy="520" r="0.9"/><circle cx="1120" cy="520" r="0.9"/><circle cx="1160" cy="520" r="0.9"/>
+    <circle cx="40" cy="560" r="0.9"/><circle cx="80" cy="560" r="0.9"/><circle cx="120" cy="560" r="0.9"/><circle cx="160" cy="560" r="0.9"/><circle cx="200" cy="560" r="0.9"/><circle cx="240" cy="560" r="0.9"/><circle cx="280" cy="560" r="0.9"/><circle cx="320" cy="560" r="0.9"/><circle cx="360" cy="560" r="0.9"/><circle cx="400" cy="560" r="0.9"/><circle cx="440" cy="560" r="0.9"/><circle cx="480" cy="560" r="0.9"/><circle cx="520" cy="560" r="0.9"/><circle cx="560" cy="560" r="0.9"/><circle cx="600" cy="560" r="0.9"/><circle cx="640" cy="560" r="0.9"/><circle cx="680" cy="560" r="0.9"/><circle cx="720" cy="560" r="0.9"/><circle cx="760" cy="560" r="0.9"/><circle cx="800" cy="560" r="0.9"/><circle cx="840" cy="560" r="0.9"/><circle cx="880" cy="560" r="0.9"/><circle cx="920" cy="560" r="0.9"/><circle cx="960" cy="560" r="0.9"/><circle cx="1000" cy="560" r="0.9"/><circle cx="1040" cy="560" r="0.9"/><circle cx="1080" cy="560" r="0.9"/><circle cx="1120" cy="560" r="0.9"/><circle cx="1160" cy="560" r="0.9"/>
+    <circle cx="40" cy="600" r="0.9"/><circle cx="80" cy="600" r="0.9"/><circle cx="120" cy="600" r="0.9"/><circle cx="160" cy="600" r="0.9"/><circle cx="200" cy="600" r="0.9"/><circle cx="240" cy="600" r="0.9"/><circle cx="280" cy="600" r="0.9"/><circle cx="320" cy="600" r="0.9"/><circle cx="360" cy="600" r="0.9"/><circle cx="400" cy="600" r="0.9"/><circle cx="440" cy="600" r="0.9"/><circle cx="480" cy="600" r="0.9"/><circle cx="520" cy="600" r="0.9"/><circle cx="560" cy="600" r="0.9"/><circle cx="600" cy="600" r="0.9"/><circle cx="640" cy="600" r="0.9"/><circle cx="680" cy="600" r="0.9"/><circle cx="720" cy="600" r="0.9"/><circle cx="760" cy="600" r="0.9"/><circle cx="800" cy="600" r="0.9"/><circle cx="840" cy="600" r="0.9"/><circle cx="880" cy="600" r="0.9"/><circle cx="920" cy="600" r="0.9"/><circle cx="960" cy="600" r="0.9"/><circle cx="1000" cy="600" r="0.9"/><circle cx="1040" cy="600" r="0.9"/><circle cx="1080" cy="600" r="0.9"/><circle cx="1120" cy="600" r="0.9"/><circle cx="1160" cy="600" r="0.9"/>
+  </g>
+
+  <!-- Top-left logo mark -->
+  <g transform="translate(40, 28)">
+    <g shape-rendering="crispEdges">
+      <!-- Mini pixel pet at 2px scale -->
+      <rect x="4" y="4" width="2" height="2" fill="#4ade80"/>
+      <rect x="10" y="4" width="2" height="2" fill="#4ade80"/>
+      <rect x="2" y="6" width="12" height="2" fill="#22c55e"/>
+      <rect x="4" y="6" width="2" height="2" fill="#000000"/>
+      <rect x="10" y="6" width="2" height="2" fill="#000000"/>
+      <rect x="2" y="8" width="12" height="2" fill="#22c55e"/>
+      <rect x="4" y="10" width="4" height="2" fill="#22c55e"/>
+      <rect x="10" y="10" width="4" height="2" fill="#22c55e"/>
+    </g>
+    <text x="20" y="13" font-family="'Courier New', 'Lucida Console', monospace" font-size="11" font-weight="700" fill="#f0f0f0" letter-spacing="2">VIBE ISLAND</text>
+  </g>
+
+  <!-- Green glow behind pet -->
+  <ellipse cx="600" cy="180" rx="200" ry="120" fill="url(#petGlowOG)"/>
+
+  <!-- Pixel pet top-center: large, at 20px scale = 260x160 -->
+  <!-- 13*20=260, 8*20=160. center x=(1200-260)/2=470, y=55 -->
+  <g shape-rendering="crispEdges" transform="translate(470, 55)">
+    <!-- Left eye (2,2) bright green -->
+    <rect x="40" y="40" width="20" height="20" fill="#4ade80"/>
+    <!-- Right eye (5,2) bright green -->
+    <rect x="100" y="40" width="20" height="20" fill="#4ade80"/>
+    <!-- Body row 1 (1,3,6,1) green -->
+    <rect x="20" y="60" width="120" height="20" fill="#22c55e"/>
+    <!-- Left pupil (2,3) black -->
+    <rect x="40" y="60" width="20" height="20" fill="#000000"/>
+    <!-- Right pupil (5,3) black -->
+    <rect x="100" y="60" width="20" height="20" fill="#000000"/>
+    <!-- Body row 2 (1,4,6,1) green -->
+    <rect x="20" y="80" width="120" height="20" fill="#22c55e"/>
+    <!-- Left foot (2,5,2,1) green -->
+    <rect x="40" y="100" width="40" height="20" fill="#22c55e"/>
+    <!-- Right foot (5,5,2,1) green -->
+    <rect x="100" y="100" width="40" height="20" fill="#22c55e"/>
+  </g>
+
+  <!-- Main heading: "Dynamic Island" -->
+  <text x="600" y="310" font-family="'Courier New', 'Lucida Console', monospace" font-size="72" font-weight="700" fill="#f0f0f0" text-anchor="middle" letter-spacing="-1">Dynamic Island</text>
+
+  <!-- Subtitle: "for your AI agents" -->
+  <text x="600" y="375" font-family="'Courier New', 'Lucida Console', monospace" font-size="42" fill="#6b7280" text-anchor="middle">for your AI agents</text>
+
+  <!-- Left: macOS-style dark pill mockup showing "fix auth bug" -->
+  <g transform="translate(60, 420)">
+    <!-- Dark pill -->
+    <rect width="240" height="48" rx="24" ry="24" fill="#1a1a1a" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <!-- Mini pixel pet inside pill, 3px scale -->
+    <g shape-rendering="crispEdges" transform="translate(12, 8)">
+      <rect x="6" y="6" width="3" height="3" fill="#4ade80"/>
+      <rect x="15" y="6" width="3" height="3" fill="#4ade80"/>
+      <rect x="3" y="9" width="18" height="3" fill="#22c55e"/>
+      <rect x="6" y="9" width="3" height="3" fill="#000"/>
+      <rect x="15" y="9" width="3" height="3" fill="#000"/>
+      <rect x="3" y="12" width="18" height="3" fill="#22c55e"/>
+      <rect x="6" y="15" width="6" height="3" fill="#22c55e"/>
+      <rect x="15" y="15" width="6" height="3" fill="#22c55e"/>
+    </g>
+    <!-- "fix auth bug" text -->
+    <text x="48" y="29" font-family="'Courier New', monospace" font-size="13" fill="#f0f0f0">fix auth bug</text>
+    <!-- Orange dot (claude working) -->
+    <circle cx="220" cy="24" r="5" fill="#f97316"/>
+  </g>
+
+  <!-- Tool badges row at bottom -->
+  <!-- Tools: Claude | Codex | Gemini | Cursor | Amp | Kimi | Kiro -->
+  <!-- 7 badges, each ~110px wide with 12px gap. Total = 7*110 + 6*12 = 770+72=842. Start at (1200-842)/2=179 -->
+  <g transform="translate(179, 490)">
+    <!-- Claude badge -->
+    <rect width="108" height="32" rx="16" fill="#1a1a1a" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <circle cx="18" cy="16" r="5" fill="#f97316"/>
+    <text x="30" y="21" font-family="'Courier New', monospace" font-size="12" fill="#f0f0f0">Claude</text>
+
+    <!-- Codex badge -->
+    <rect x="120" width="108" height="32" rx="16" fill="#1a1a1a" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <circle cx="138" cy="16" r="5" fill="#10b981"/>
+    <text x="150" y="21" font-family="'Courier New', monospace" font-size="12" fill="#f0f0f0">Codex</text>
+
+    <!-- Gemini badge -->
+    <rect x="240" width="108" height="32" rx="16" fill="#1a1a1a" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <circle cx="258" cy="16" r="5" fill="#4285f4"/>
+    <text x="270" y="21" font-family="'Courier New', monospace" font-size="12" fill="#f0f0f0">Gemini</text>
+
+    <!-- Cursor badge -->
+    <rect x="360" width="108" height="32" rx="16" fill="#1a1a1a" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <circle cx="378" cy="16" r="5" fill="#3b82f6"/>
+    <text x="390" y="21" font-family="'Courier New', monospace" font-size="12" fill="#f0f0f0">Cursor</text>
+
+    <!-- Amp badge -->
+    <rect x="480" width="108" height="32" rx="16" fill="#1a1a1a" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <circle cx="498" cy="16" r="5" fill="#8b5cf6"/>
+    <text x="510" y="21" font-family="'Courier New', monospace" font-size="12" fill="#f0f0f0">Amp</text>
+
+    <!-- Kimi badge -->
+    <rect x="600" width="108" height="32" rx="16" fill="#1a1a1a" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <circle cx="618" cy="16" r="5" fill="#06b6d4"/>
+    <text x="630" y="21" font-family="'Courier New', monospace" font-size="12" fill="#f0f0f0">Kimi</text>
+
+    <!-- Kiro badge -->
+    <rect x="720" width="108" height="32" rx="16" fill="#1a1a1a" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <circle cx="738" cy="16" r="5" fill="#ec4899"/>
+    <text x="750" y="21" font-family="'Courier New', monospace" font-size="12" fill="#f0f0f0">Kiro</text>
+  </g>
+
+  <!-- Bottom label -->
+  <text x="600" y="595" font-family="'Courier New', monospace" font-size="11" fill="#374151" text-anchor="middle" letter-spacing="2">vibeisland.app</text>
+</svg>

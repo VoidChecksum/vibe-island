@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 400" width="700" height="400">
+  <!-- Background -->
+  <rect width="700" height="400" rx="8" ry="8" fill="#0f0f0f" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+  <!-- Title -->
+  <text x="350" y="34" font-family="'Courier New', 'Lucida Console', monospace" font-size="15" font-weight="700" fill="#f0f0f0" text-anchor="middle" letter-spacing="1">Vibe Island Architecture</text>
+
+  <!-- Column headers -->
+  <text x="175" y="62" font-family="'Courier New', monospace" font-size="11" fill="#6b7280" text-anchor="middle" letter-spacing="1">RUST BACKEND</text>
+  <text x="525" y="62" font-family="'Courier New', monospace" font-size="11" fill="#6b7280" text-anchor="middle" letter-spacing="1">REACT FRONTEND</text>
+
+  <!-- Divider line -->
+  <line x1="350" y1="48" x2="350" y2="340" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="4,4"/>
+
+  <!-- Left column boxes -->
+
+  <!-- SocketServer -->
+  <rect x="40" y="75" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="160" y="97" font-family="'Courier New', monospace" font-size="13" font-weight="600" fill="#f0f0f0" text-anchor="middle">SocketServer</text>
+  <text x="160" y="116" font-family="'Courier New', monospace" font-size="10" fill="#6b7280" text-anchor="middle">~/.vibe-island/run/*.sock</text>
+
+  <!-- SessionStore -->
+  <rect x="40" y="155" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="160" y="177" font-family="'Courier New', monospace" font-size="13" font-weight="600" fill="#f0f0f0" text-anchor="middle">SessionStore</text>
+  <text x="160" y="196" font-family="'Courier New', monospace" font-size="10" fill="#6b7280" text-anchor="middle">Arc&lt;RwLock&lt;HashMap&gt;&gt;</text>
+
+  <!-- HookInstaller -->
+  <rect x="40" y="235" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="160" y="257" font-family="'Courier New', monospace" font-size="13" font-weight="600" fill="#f0f0f0" text-anchor="middle">HookInstaller</text>
+  <text x="160" y="276" font-family="'Courier New', monospace" font-size="10" fill="#6b7280" text-anchor="middle">14 tools · proto vi-e7c4</text>
+
+  <!-- Platform -->
+  <rect x="40" y="315" width="240" height="40" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="160" y="332" font-family="'Courier New', monospace" font-size="13" font-weight="600" fill="#f0f0f0" text-anchor="middle">Platform</text>
+  <text x="160" y="347" font-family="'Courier New', monospace" font-size="10" fill="#6b7280" text-anchor="middle">13+ terminals · jump_to_terminal()</text>
+
+  <!-- Right column boxes -->
+
+  <!-- NotchPanel -->
+  <rect x="420" y="75" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="540" y="97" font-family="'Courier New', monospace" font-size="13" font-weight="600" fill="#f0f0f0" text-anchor="middle">NotchPanel</text>
+  <text x="540" y="116" font-family="'Courier New', monospace" font-size="10" fill="#6b7280" text-anchor="middle">SessionRow · PixelPet · dwell collapse</text>
+
+  <!-- SettingsPanel -->
+  <rect x="420" y="155" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="540" y="177" font-family="'Courier New', monospace" font-size="13" font-weight="600" fill="#f0f0f0" text-anchor="middle">SettingsPanel</text>
+  <text x="540" y="196" font-family="'Courier New', monospace" font-size="10" fill="#6b7280" text-anchor="middle">Behavior · Display · Integrations</text>
+
+  <!-- ApprovalCard -->
+  <rect x="420" y="235" width="240" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="540" y="257" font-family="'Courier New', monospace" font-size="13" font-weight="600" fill="#f0f0f0" text-anchor="middle">ApprovalCard</text>
+  <text x="540" y="276" font-family="'Courier New', monospace" font-size="10" fill="#6b7280" text-anchor="middle">Diff view · Q&amp;A · cmd+Y / cmd+N</text>
+
+  <!-- Horizontal bi-directional arrows between columns -->
+
+  <!-- Arrow: SocketServer <-> NotchPanel (y=103) -->
+  <line x1="284" y1="103" x2="416" y2="103" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" marker-start="url(#arrowLeft)" marker-end="url(#arrowRight)"/>
+
+  <!-- Arrow: SessionStore <-> SettingsPanel (y=183) -->
+  <line x1="284" y1="183" x2="416" y2="183" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" marker-start="url(#arrowLeft)" marker-end="url(#arrowRight)"/>
+
+  <!-- Arrow: HookInstaller -> NotchPanel (diagonal) -->
+  <line x1="284" y1="263" x2="416" y2="263" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrowRight)"/>
+
+  <!-- Vertical connector arrows on left -->
+  <line x1="160" y1="131" x2="160" y2="151" stroke="rgba(255,255,255,0.15)" stroke-width="1" marker-end="url(#arrowDown)"/>
+  <line x1="160" y1="211" x2="160" y2="231" stroke="rgba(255,255,255,0.15)" stroke-width="1" marker-end="url(#arrowDown)"/>
+  <line x1="160" y1="291" x2="160" y2="311" stroke="rgba(255,255,255,0.15)" stroke-width="1" marker-end="url(#arrowDown)"/>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowRight" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,255,255,0.35)"/>
+    </marker>
+    <marker id="arrowLeft" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto-start-reverse">
+      <path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,255,255,0.35)"/>
+    </marker>
+    <marker id="arrowDown" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,255,255,0.25)"/>
+    </marker>
+  </defs>
+
+  <!-- Data flow bar at bottom -->
+  <rect x="20" y="370" width="660" height="22" rx="4" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <text x="350" y="385" font-family="'Courier New', monospace" font-size="10" fill="#6b7280" text-anchor="middle" letter-spacing="0.3">Hook  →  ~/.vibe-island/run/*.sock  →  Tauri IPC  →  React</text>
+</svg>
