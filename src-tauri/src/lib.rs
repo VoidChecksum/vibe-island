@@ -5,6 +5,7 @@ mod socket;
 mod sound;
 mod platform;
 mod updater;
+mod ssh_remote;
 
 use sessions::SessionStore;
 use socket::SocketServer;
@@ -23,6 +24,7 @@ pub struct AppState {
     pub sessions: SessionStore,
     pub config: AppConfig,
     pub sound: SoundManager,
+    pub ssh_remote: ssh_remote::SshRemoteManager,
 }
 
 #[tauri::command]
@@ -134,6 +136,31 @@ async fn set_bypass_mode(session_id: String, enabled: bool) -> Result<(), String
 }
 
 #[tauri::command]
+async fn ssh_connect(
+    state: tauri::State<'_, SharedState>,
+    host: String,
+    user: String,
+    port: Option<u16>,
+    key_path: Option<String>,
+    remote_socket: Option<String>,
+) -> Result<ssh_remote::RemoteInfo, String> {
+    let s = state.read().await;
+    s.ssh_remote.connect(host, user, port.unwrap_or(22), key_path, remote_socket).await
+}
+
+#[tauri::command]
+async fn ssh_disconnect(state: tauri::State<'_, SharedState>, host: String) -> Result<(), String> {
+    let s = state.read().await;
+    s.ssh_remote.disconnect(&host).await
+}
+
+#[tauri::command]
+async fn ssh_list_remotes(state: tauri::State<'_, SharedState>) -> Result<Vec<ssh_remote::RemoteInfo>, String> {
+    let s = state.read().await;
+    Ok(s.ssh_remote.list().await)
+}
+
+#[tauri::command]
 async fn cleanup_sessions(state: tauri::State<'_, SharedState>) -> Result<usize, String> {
     let timeout = {
         let s = state.read().await;
@@ -160,6 +187,7 @@ pub fn run() {
         sessions: SessionStore::new(),
         config,
         sound: SoundManager::new(),
+        ssh_remote: ssh_remote::SshRemoteManager::new(),
     }));
 
     tauri::Builder::default()
@@ -188,6 +216,9 @@ pub fn run() {
             uninstall_hooks,
             set_bypass_mode,
             cleanup_sessions,
+            ssh_connect,
+            ssh_disconnect,
+            ssh_list_remotes,
             updater::check_for_update,
             updater::install_update,
         ])

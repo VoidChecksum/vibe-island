@@ -207,14 +207,23 @@ export function NotchPanel() {
               <div className="mx-3" style={{ height: 1, background: "var(--notch-border)" }} />
 
               <div className="max-h-72 overflow-y-auto py-1 px-1.5 space-y-0.5">
-                {activeSessions.map((session, i) => (
+                {/* Render parent sessions only; subagents shown inline as nested rows */}
+                {activeSessions.filter(s => !s.subagent_parent_id).map((session, i) => {
+                  const subagents = activeSessions.filter(s => s.subagent_parent_id === session.id);
+                  return (
                   <div key={session.id}>
                     <SessionRow session={session} isHero={i === 0} />
+                    {subagents.map(sub => (
+                      <div key={sub.id} style={{ marginLeft: 12, borderLeft: "2px solid rgba(255,255,255,0.08)", paddingLeft: 6, marginTop: 2 }}>
+                        <SessionRow session={sub} isHero={false} />
+                      </div>
+                    ))}
                     {(session.status === "waiting_for_approval" || session.status === "waiting_for_answer") && (
                       <ApprovalCard session={session} />
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div
