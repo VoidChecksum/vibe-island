@@ -88,6 +88,107 @@ fn read_osc2_title(session_id: &str) -> Option<String> {
     std::fs::read_to_string(dir.join(prefix)).ok()
 }
 
+/// Find the PID of the terminal emulator that owns the given TTY (Linux /proc scan).
+#[cfg(target_os = "linux")]
+fn tty_owner_pid(tty_path: &str) -> Option<u32> {
+    let tty_name = tty_path.trim_start_matches("/dev/");
+    let proc = std::fs::read_dir("/proc").ok()?;
+    let mut best_pid: Option<u32> = None;
+    for entry in proc.flatten() {
+        let pid_str = entry.file_name();
+        let pid: u32 = pid_str.to_string_lossy().parse().ok()?;
+        let stat_path = format!("/proc/{}/stat", pid);
+        if let Ok(stat) = std::fs::read_to_string(&stat_path) {
+            // field 7 (0-indexed) is tty_nr — we use fd/0 → readlink instead
+        }
+        let _ = stat_path; // suppress unused warning
+        let fd0 = format!("/proc/{}/fd/0", pid);
+        if let Ok(link) = std::fs::read_link(&fd0) {
+            if link.to_string_lossy().contains(tty_name) {
+                best_pid = Some(pid);
+            }
+        }
+    }
+    best_pid
+}
+
+/// Focus a window by PID on X11 using xdotool.
+#[cfg(target_os = "linux")]
+fn focus_by_pid_x11(pid: u32) -> bool {
+    let out = std::process::Command::new("xdotool")
+        .args(["search", "--pid", &pid.to_string(), "--limit", "1", "windowactivate", "--sync"])
+        .output();
+    out.map(|o| o.status.success()).unwrap_or(false)
+}
+
+/// Focus a window by PID on Sway/wlroots Wayland.
+#[cfg(target_os = "linux")]
+fn focus_by_pid_sway(pid: u32) -> bool {
+    let out = std::process::Command::new("swaymsg")
+        .arg(format!("[pid={}] focus", pid))
+        .output();
+    out.map(|o| o.status.success()).unwrap_or(false)
+}
+
+/// Focus a window by PID on Hyprland.
+#[cfg(target_os = "linux")]
+fn focus_by_pid_hyprland(pid: u32) -> bool {
+    let out = std::process::Command::new("hyprctl")
+        .args(["dispatch", "focuswindow", &format!("pid:{}", pid)])
+        .output();
+    out.map(|o| o.status.success()).unwrap_or(false)
+}
+
+/// Focus a window by PID on KDE Plasma (Wayland or X11).
+#[cfg(target_os = "linux")]
+fn focus_by_pid_kde(pid: u32) -> bool {
+    // KDE uses KWin scripting; simplest cross-version approach: wmctrl -ip on XWayland
+    let out = std::process::Command::new("wmctrl")
+        .args(["-l", "-p"])
+        .output();
+    if let Ok(o) = out {
+        for line in String::from_utf8_lossy(&o.stdout).lines() {
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() >= 3 {
+                if let Ok(p) = parts[2].parse::<u32>() {
+                    if p == pid {
+                        let wid = parts[0];
+                        let _ = std::process::Command::new("wmctrl")
+                            .args(["-ia", wid])
+                            .output();
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    false
+}
+
+/// tmux: focus pane by TTY path.
+#[cfg(target_os = "linux")]
+fn focus_tmux_by_tty(tty_path: &str) -> bool {
+    let tty_name = tty_path.trim_start_matches("/dev/");
+    let output = std::process::Command::new("tmux")
+        .args(["list-panes", "-a", "-F", "#{pane_tty} #{session_name}:#{window_index}.#{pane_index} #{pane_active}"])
+        .output();
+    if let Ok(out) = output {
+        for line in String::from_utf8_lossy(&out.stdout).lines() {
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() >= 2 && parts[0].contains(tty_name) {
+                let _ = std::process::Command::new("tmux")
+                    .args(["select-pane", "-t", parts[1]])
+                    .output();
+                let _ = std::process::Command::new("tmux")
+                    .args(["select-window", "-t", parts[1]])
+                    .output();
+                return true;
+            }
+        }
+    }
+    false
+}
+
 pub fn jump_to_terminal(session: &crate::sessions::Session) {
     let session_id = session.id.clone();
     let tty = session.tty.clone();
@@ -99,6 +200,8 @@ pub fn jump_to_terminal(session: &crate::sessions::Session) {
     {
         if let Some(ref tty_path) = tty {
             let tty_name = tty_path.trim_start_matches("/dev/");
+
+            // iTerm2
             let script = format!(r#"tell application "iTerm2"
     if not (it is running) then return "not running"
     repeat with aWin in windows
@@ -116,17 +219,12 @@ pub fn jump_to_terminal(session: &crate::sessions::Session) {
     end repeat
     return "not found"
 end tell"#, tty = tty_name);
-            let result = std::process::Command::new("osascript")
-                .args(["-e", &script])
-                .output();
+            let result = std::process::Command::new("osascript").args(["-e", &script]).output();
             if let Ok(out) = result {
-                let s = String::from_utf8_lossy(&out.stdout);
-                if s.trim() == "ok" { return; }
+                if String::from_utf8_lossy(&out.stdout).trim() == "ok" { return; }
             }
-        }
 
-        if let Some(ref tty_path) = tty {
-            let tty_name = tty_path.trim_start_matches("/dev/");
+            // Terminal.app
             let script = format!(r#"tell application "Terminal"
     if not (it is running) then return "not running"
     repeat with aWin in windows
@@ -140,57 +238,76 @@ end tell"#, tty = tty_name);
     end repeat
     return "not found"
 end tell"#, tty = tty_name);
-            let result = std::process::Command::new("osascript")
-                .args(["-e", &script])
-                .output();
+            let result = std::process::Command::new("osascript").args(["-e", &script]).output();
             if let Ok(out) = result {
-                let s = String::from_utf8_lossy(&out.stdout);
-                if s.trim() == "ok" { return; }
+                if String::from_utf8_lossy(&out.stdout).trim() == "ok" { return; }
             }
-        }
 
-        let sentinel = format!("/tmp/vibe-island-ghostty-title-{}", &session_id[..session_id.len().min(8)]);
-        if let Some(ref title) = title_hint {
-            let _ = std::fs::write(&sentinel, title);
+            // Ghostty: write sentinel file (Ghostty reads it to focus the matching tab)
+            let sentinel = format!("/tmp/vibe-island-ghostty-title-{}", &session_id[..session_id.len().min(8)]);
+            if let Some(ref title) = title_hint {
+                let _ = std::fs::write(&sentinel, title);
+            }
+
+            // Kitty: focus via kitty remote control (if KITTY_LISTEN_ON is set)
+            if let Ok(listen) = std::env::var("KITTY_LISTEN_ON") {
+                let _ = std::process::Command::new("kitty")
+                    .args(["@", "--to", &listen, "focus-window"])
+                    .output();
+                return;
+            }
+
+            // Warp: generic activate by bundle id
+            let script = r#"tell application id "dev.warp.Warp-Stable" to activate"#;
+            let _ = std::process::Command::new("osascript").args(["-e", script]).output();
         }
     }
 
     #[cfg(target_os = "linux")]
     {
-        if std::env::var("HYPRLAND_INSTANCE_SIGNATURE").is_ok() {
+        // 1. tmux: works inside any terminal, highest priority
+        if std::env::var("TMUX").is_ok() {
             if let Some(ref tty_path) = tty {
-                let _ = std::process::Command::new("hyprctl")
-                    .args(["dispatch", "focuswindow", &format!("title:{}", tty_path)])
-                    .output();
-                return;
+                if focus_tmux_by_tty(tty_path) { return; }
             }
         }
 
-        if let Ok(_) = std::env::var("TMUX") {
-            if let Some(ref tty_path) = tty {
-                let tty_name = tty_path.trim_start_matches("/dev/");
-                let output = std::process::Command::new("tmux")
-                    .args(["list-panes", "-a", "-F", "#{pane_tty} #{session_name}:#{window_index}.#{pane_index}"])
-                    .output();
-                if let Ok(out) = output {
-                    for line in String::from_utf8_lossy(&out.stdout).lines() {
-                        let parts: Vec<&str> = line.split_whitespace().collect();
-                        if parts.len() >= 2 && parts[0].contains(tty_name) {
-                            let target = parts[1];
-                            let _ = std::process::Command::new("tmux")
-                                .args(["select-pane", "-t", target])
-                                .output();
-                            return;
-                        }
-                    }
-                }
-            }
+        // 2. Resolve terminal emulator PID from TTY (works for all terminals)
+        let term_pid = tty.as_deref().and_then(tty_owner_pid);
+
+        let compositor = if std::env::var("HYPRLAND_INSTANCE_SIGNATURE").is_ok() {
+            "hyprland"
+        } else if std::env::var("SWAYSOCK").is_ok() {
+            "sway"
+        } else if std::env::var("KDE_FULL_SESSION").is_ok() || std::env::var("KDE_SESSION_VERSION").is_ok() {
+            "kde"
+        } else if std::env::var("WAYLAND_DISPLAY").is_ok() {
+            "wayland-generic"
+        } else {
+            "x11"
+        };
+
+        if let Some(pid) = term_pid {
+            let focused = match compositor {
+                "hyprland" => focus_by_pid_hyprland(pid),
+                "sway" => focus_by_pid_sway(pid),
+                "kde" => focus_by_pid_kde(pid) || focus_by_pid_x11(pid),
+                _ => focus_by_pid_x11(pid), // x11 or wayland-generic via XWayland
+            };
+            if focused { return; }
         }
 
+        // 3. Fallback: title-based xdotool (X11 / XWayland) or swaymsg
         if let Some(ref title) = title_hint {
-            let _ = std::process::Command::new("xdotool")
-                .args(["search", "--name", title, "windowactivate"])
-                .output();
+            if compositor == "sway" || compositor == "wayland-generic" {
+                let _ = std::process::Command::new("swaymsg")
+                    .arg(format!("[title=\"{}\"] focus", title))
+                    .output();
+            } else {
+                let _ = std::process::Command::new("xdotool")
+                    .args(["search", "--name", title, "windowactivate"])
+                    .output();
+            }
         }
     }
 
