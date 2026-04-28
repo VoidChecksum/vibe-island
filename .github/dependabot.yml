@@ -4,11 +4,28 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    groups:
+      npm-minor-patch:
+        update-types: [minor, patch]
+        patterns: ["*"]
+      npm-major:
+        update-types: [major]
+        patterns: ["*"]
   - package-ecosystem: cargo
     directory: /src-tauri
     schedule:
       interval: weekly
+    groups:
+      cargo-minor-patch:
+        update-types: [minor, patch]
+        patterns: ["*"]
+      cargo-major:
+        update-types: [major]
+        patterns: ["*"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]
