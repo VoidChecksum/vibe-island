@@ -28,7 +28,7 @@ uuid = { version = "1", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde"] }
 dirs = "6"
 notify = "7"
-rodio = "0.20"
+rodio = "0.22"
 toml = "0.8"
 tracing = "0.1"
 tracing-subscriber = "0.3"
