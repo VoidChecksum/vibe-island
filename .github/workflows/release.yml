@@ -35,7 +35,7 @@ jobs:
             librsvg2-dev libasound2-dev wmctrl xdotool
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
