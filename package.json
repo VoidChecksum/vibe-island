@@ -65,7 +65,7 @@
   "devDependencies": {
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@vitejs/plugin-react": "^4",
+    "@vitejs/plugin-react": "^6",
     "autoprefixer": "^10",
     "postcss": "^8",
     "tailwindcss": "^3",
