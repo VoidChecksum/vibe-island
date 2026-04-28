@@ -291,6 +291,8 @@ Then [download the app](#download) for your platform.
 
 ### Option 3 — Build from source
 
+Requires Node.js 20+ and Rust 1.88+ (see `src-tauri/rust-toolchain.toml`).
+
 ```bash
 git clone https://github.com/VoidChecksum/vibe-island.git
 cd vibe-island
